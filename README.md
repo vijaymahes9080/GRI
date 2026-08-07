@@ -74,7 +74,7 @@ flowchart LR
 | 3 | Database Design | ✅ Complete | [Schema SQL](docs/database/schema.sql) |
 | 4 | UI/UX Design | ✅ Complete | [UI/UX Specification](docs/ui_ux/ui_ux_specification.md) |
 | 5 | Flutter Development | ✅ Complete | [Flutter Architecture](docs/flutter_architecture.md) |
-| 6 | Backend APIs | ⏳ Pending | — |
+| 6 | Backend APIs | ✅ Complete | [Backend Architecture](docs/backend_architecture.md) |
 | 7 | Authentication | ⏳ Pending | — |
 | 8 | AI Chatbot + RAG | ⏳ Pending | — |
 | 9 | ERP Integration | ⏳ Pending | — |
