@@ -3,7 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from backend.app.core.config import settings
-from backend.app.api.v1.endpoints import auth, students, files
+from backend.app.api.v1.endpoints import (
+    auth,
+    oauth,
+    rag,
+    erp,
+    notifications,
+    students,
+    files,
+    academics,
+    examinations,
+    hostel,
+)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -34,6 +45,9 @@ Instrumentator().instrument(app).expose(app)
 # Include Routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
 app.include_router(oauth.router, prefix=f"{settings.API_V1_STR}/oauth", tags=["OAuth, OTP & MFA"])
+app.include_router(academics.router, prefix=f"{settings.API_V1_STR}/academics", tags=["Academics & Attendance"])
+app.include_router(examinations.router, prefix=f"{settings.API_V1_STR}/examinations", tags=["Examinations & Results"])
+app.include_router(hostel.router, prefix=f"{settings.API_V1_STR}/hostel", tags=["Hostel & Outpass"])
 app.include_router(rag.router, prefix=f"{settings.API_V1_STR}/rag", tags=["AI Chatbot & RAG Engine"])
 app.include_router(erp.router, prefix=f"{settings.API_V1_STR}/erp", tags=["ERP Middleware & Webhooks"])
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
