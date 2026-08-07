@@ -120,21 +120,51 @@ GRI/
 
 ---
 
-## ⚡ Quick Start for Android Development
+## ⚡ Quick Start & Mobile Application Preview Options
 
+### 1. Install Dependencies
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Start Expo dev server
-npm start
-
-# 3. Run directly on connected Android device / emulator
-npm run android
 ```
+
+---
+
+### 📲 Preview Options:
+
+#### Option 1: Preview on Your Android Phone via Expo Go (Easiest & Fastest!)
+1. **Install Expo Go on your phone**:
+   - Open **Google Play Store** on your Android phone and install the free **Expo Go** app.
+2. **Connect to the same Wi-Fi**:
+   - Ensure your phone and PC are connected to the same Wi-Fi network.
+3. **Start the Expo server**:
+   ```powershell
+   npx expo start
+   ```
+4. **Scan the QR Code**:
+   - Open **Expo Go** on your phone, tap **Scan QR Code**, and scan the QR code displayed in your terminal.
+   - The app will compile and launch instantly on your phone with live reload enabled!
+
+---
+
+#### Option 2: Live USB Debugging / Direct Android Install
+If your phone is connected to your PC via USB cable (with USB Debugging enabled):
+```powershell
+npx expo run:android
+```
+Expo will compile the native APK and automatically launch the app on your connected Android phone (`RZCX2175PPX`).
+
+---
+
+#### Option 3: Web Browser Preview (Instant Layout Test)
+If you want to quickly test screens and navigation in a browser:
+```powershell
+npx expo start --web
+```
+Open `http://localhost:8081` in Chrome or Edge to view and interact with the application layout!
 
 ---
 
 ## 📄 License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
+
