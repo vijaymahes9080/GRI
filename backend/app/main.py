@@ -14,6 +14,7 @@ from backend.app.api.v1.endpoints import (
     academics,
     examinations,
     hostel,
+    ai_analytics,
 )
 
 app = FastAPI(
@@ -49,6 +50,7 @@ app.include_router(academics.router, prefix=f"{settings.API_V1_STR}/academics", 
 app.include_router(examinations.router, prefix=f"{settings.API_V1_STR}/examinations", tags=["Examinations & Results"])
 app.include_router(hostel.router, prefix=f"{settings.API_V1_STR}/hostel", tags=["Hostel & Outpass"])
 app.include_router(rag.router, prefix=f"{settings.API_V1_STR}/rag", tags=["AI Chatbot & RAG Engine"])
+app.include_router(ai_analytics.router, prefix=f"{settings.API_V1_STR}/ai", tags=["AI Analytics & Predictions"])
 app.include_router(erp.router, prefix=f"{settings.API_V1_STR}/erp", tags=["ERP Middleware & Webhooks"])
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
