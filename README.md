@@ -73,7 +73,7 @@ flowchart LR
 | 2 | Website Data Collection | ✅ Complete | [Data Blueprint](research/data_collection/data_collection_blueprint.md) |
 | 3 | Database Design | ✅ Complete | [Schema SQL](docs/database/schema.sql) |
 | 4 | UI/UX Design | ✅ Complete | [UI/UX Specification](docs/ui_ux/ui_ux_specification.md) |
-| 5 | Flutter Development | ⏳ Pending | — |
+| 5 | Flutter Development | ✅ Complete | [Flutter Architecture](docs/flutter_architecture.md) |
 | 6 | Backend APIs | ⏳ Pending | — |
 | 7 | Authentication | ⏳ Pending | — |
 | 8 | AI Chatbot + RAG | ⏳ Pending | — |
