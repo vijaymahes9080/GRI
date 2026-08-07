@@ -57,7 +57,7 @@ flowchart LR
     S4 --> S5([⏳ Stage 5\nFlutter Dev])
     S5 --> S6([✅ Stage 6\nBackend APIs])
     S6 --> S7([✅ Stage 7\nAuthentication])
-    S7 --> S8([⏳ Stage 8\nAI Chatbot + RAG])
+    S7 --> S8([✅ Stage 8\nAI Chatbot + RAG])
     S8 --> S9([⏳ Stage 9\nERP Integration])
     S9 --> S10([⏳ Stage 10\nNotifications])
     S10 --> S11([⏳ Stage 11\nSecurity])
@@ -76,7 +76,7 @@ flowchart LR
 | 5 | Flutter Development | ✅ Complete | [Flutter Architecture](docs/flutter_architecture.md) |
 | 6 | Backend APIs | ✅ Complete | [Backend Architecture](docs/backend_architecture.md) |
 | 7 | Authentication | ✅ Complete | [Authentication Architecture](docs/authentication_architecture.md) |
-| 8 | AI Chatbot + RAG | ⏳ Pending | — |
+| 8 | AI Chatbot + RAG | ✅ Complete | [AI RAG Architecture](docs/ai_rag_architecture.md) |
 | 9 | ERP Integration | ⏳ Pending | — |
 | 10 | Notifications | ⏳ Pending | — |
 | 11 | Security & Compliance | ⏳ Pending | — |
