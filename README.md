@@ -72,7 +72,7 @@ flowchart LR
 | 1 | Requirement Engineering | ✅ Complete | [SRS Specification](docs/srs_specification.md) |
 | 2 | Website Data Collection | ✅ Complete | [Data Blueprint](research/data_collection/data_collection_blueprint.md) |
 | 3 | Database Design | ✅ Complete | [Schema SQL](docs/database/schema.sql) |
-| 4 | UI/UX Design | 🔄 In Progress | — |
+| 4 | UI/UX Design | ✅ Complete | [UI/UX Specification](docs/ui_ux/ui_ux_specification.md) |
 | 5 | Flutter Development | ⏳ Pending | — |
 | 6 | Backend APIs | ⏳ Pending | — |
 | 7 | Authentication | ⏳ Pending | — |
