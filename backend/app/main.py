@@ -13,6 +13,12 @@ app = FastAPI(
     redoc_url="/redoc",          # ReDoc UI
 )
 
+from backend.app.core.security_middleware import SecurityHeadersMiddleware, RateLimiterWAFMiddleware
+
+# Add Security & WAF Rate Limiter Middleware
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimiterWAFMiddleware, max_requests=100, window_seconds=60)
+
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
