@@ -2,19 +2,17 @@
 
 <img src="https://ruraluniv.ac.in/images/gridu.png" alt="GRI Logo" width="120" height="120"/>
 
-# Gandhigram Rural Institute — Mobile & Web Application
+# Gandhigram Rural Institute — React Native Android Platform
 
-**A production-grade, AI-powered Flutter application for Gandhigram Rural Institute – Deemed to be University**
+**Production-grade, feature-first enterprise React Native Android application for Gandhigram Rural Institute (Deemed to be University)**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://python.org)
-[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![React Native](https://img.shields.io/badge/React_Native-0.74-61DAFB?logo=react&logoColor=black)](https://reactnative.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Expo](https://img.shields.io/badge/Expo-SDK_51-000000?logo=expo&logoColor=white)](https://expo.dev)
+[![Android](https://img.shields.io/badge/Android-14_(API_34)-3DDC84?logo=android&logoColor=white)](https://android.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub](https://img.shields.io/badge/GitHub-vijaymahes9080%2FGRI-181717?logo=github)](https://github.com/vijaymahes9080/GRI)
 
-[🌐 Official Website](https://ruraluniv.ac.in) · [📄 SRS Document](docs/srs_specification.md) · [🗄️ Database Schema](docs/database/schema.sql) · [📦 Data Blueprint](research/data_collection/data_collection_blueprint.md)
+[🌐 Official Website](https://ruraluniv.ac.in) · [📚 Documentation Index](docs/Project_Overview.md) · [🏗️ Architecture Specs](docs/Architecture.md)
 
 </div>
 
@@ -22,293 +20,121 @@
 
 ## 📖 Overview
 
-The **GRI Mobile & Web Application** is a unified, enterprise-grade digital platform designed for **Gandhigram Rural Institute – Deemed to be University** (Dindigul, Tamil Nadu). It brings together every facet of campus life — academics, administration, library, hostel, placements, village outreach, and an AI-powered knowledge assistant — into a single, beautifully designed cross-platform app.
+The **GRI React Native Android Platform** is an enterprise-grade native Android mobile application engineered for **Gandhigram Rural Institute – Deemed to be University** (Dindigul, Tamil Nadu).
 
-Built with **Flutter** (Android · iOS · Web), backed by **Node.js / FastAPI microservices**, and enhanced by a **RAG-based AI Chatbot** trained on GRI's official documents and regulations.
-
----
-
-## ✨ Key Features
-
-| Category | Features |
-|---|---|
-| 🎓 **Academics** | Timetable, Attendance (Geo-fenced BLE), Course Material, Internal Marks |
-| 📝 **Examinations** | Hall Tickets, Results, Grade Calculator, Ph.D. Tracking |
-| 💳 **Finance** | Fee Payment (UPI/Razorpay), Receipts, Scholarship Applications |
-| 📚 **Library** | OPAC Search, Book Issue/Return, Fine Payment, RFID Locator |
-| 🏠 **Hostel** | Room Allotment, Digital Out-Pass (Parent + Warden Approval), Mess Feedback |
-| 💼 **Placement** | Drive Notifications, Resume Builder, Interview Scheduler, Analytics |
-| 🤖 **AI Assistant** | RAG Chatbot (Tamil & English), Trained on GRI Regulations & Syllabi |
-| 🏘️ **Village Outreach** | Geo-tagged Survey Collection, UBA Project Tracker, Extension Activity Logs |
-| 🔔 **Notifications** | FCM Push, SMS, Email Alerts (Exam, Fee, Attendance, Events) |
-| 🪪 **Digital Identity** | Offline NFC/QR Smart ID Card, Bluetooth Gate Entry |
-| 🚌 **Transport** | Route Maps, Pass Management, Real-time Bus Tracking |
-| 📢 **Complaints** | Multi-category Grievance Portal with Priority Escalation |
+Built ground-up with **React Native 0.74+**, **TypeScript**, **Expo Router v3**, **Zustand**, **TanStack Query v5**, **NativeWind v4**, **MMKV**, **Axios**, and **Zod**, the architecture isolates every university feature module (Academics, Examinations, Finance, Library, Hostel, Placement, Village Outreach, Transport, Grievance Portal, and AI Knowledge Assistant) into decoupled, independently maintainable feature domains.
 
 ---
 
-## 🗺️ 15-Stage Development Pipeline
-
-```mermaid
-flowchart LR
-    S1([✅ Stage 1\nRequirements]) --> S2([✅ Stage 2\nData Collection])
-    S2 --> S3([✅ Stage 3\nDatabase Design])
-    S3 --> S4([🔄 Stage 4\nUI/UX Design])
-    S4 --> S5([⏳ Stage 5\nFlutter Dev])
-    S5 --> S6([✅ Stage 6\nBackend APIs])
-    S6 --> S7([✅ Stage 7\nAuthentication])
-    S7 --> S8([✅ Stage 8\nAI Chatbot + RAG])
-    S8 --> S9([✅ Stage 9\nERP Integration])
-    S9 --> S10([✅ Stage 10\nNotifications])
-    S10 --> S11([✅ Stage 11\nSecurity])
-    S11 --> S12([⏳ Stage 12\nTesting])
-    S12 --> S13([✅ Stage 13\nCloud Deploy])
-    S13 --> S14([✅ Stage 14\nScalability])
-    S14 --> S15([✅ Stage 15\nMaintenance])
-```
-
-| Stage | Title | Status | Docs |
-|:---:|---|:---:|---|
-| 1 | Requirement Engineering | ✅ Complete | [SRS Specification](docs/srs_specification.md) |
-| 2 | Website Data Collection | ✅ Complete | [Data Blueprint](research/data_collection/data_collection_blueprint.md) |
-| 3 | Database Design | ✅ Complete | [Schema SQL](docs/database/schema.sql) |
-| 4 | UI/UX Design | ✅ Complete | [UI/UX Specification](docs/ui_ux/ui_ux_specification.md) |
-| 5 | Flutter Development | ✅ Complete | [Flutter Architecture](docs/flutter_architecture.md) |
-| 6 | Backend APIs | ✅ Complete | [Backend Architecture](docs/backend_architecture.md) |
-| 7 | Authentication | ✅ Complete | [Authentication Architecture](docs/authentication_architecture.md) |
-| 8 | AI Chatbot + RAG | ✅ Complete | [AI RAG Architecture](docs/ai_rag_architecture.md) |
-| 9 | ERP Integration | ✅ Complete | [ERP Integration Architecture](docs/erp_integration_architecture.md) |
-| 10 | Notifications | ✅ Complete | [Notifications Architecture](docs/notifications_architecture.md) |
-| 11 | Security & Compliance | ✅ Complete | [Security Architecture](docs/security_architecture.md) |
-| 12 | Testing & QA | ⏳ Pending | — |
-| 13 | Cloud Deployment | ✅ Complete | [Cloud Deployment Architecture](docs/cloud_deployment_architecture.md) |
-| 14 | Scalability | ✅ Complete | [Scalability Architecture](docs/scalability_reliability_architecture.md) |
-| 15 | Maintenance & Expansion | ✅ Complete | [Future Expansion Architecture](docs/future_expansion_architecture.md) |
-
----
-
-## 🏗️ Architecture Overview
+## 🏗️ High-Level Platform Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│              Flutter App (iOS · Android · Web)       │
-│    Student · Faculty · Parent · Admin · Alumni       │
-└────────────────────┬────────────────────────────────┘
-                     │ HTTPS / WebSocket
-┌────────────────────▼────────────────────────────────┐
-│               Kong API Gateway                       │
-│         (Rate Limiting · Auth · Logging)             │
-└──┬───────┬─────────┬──────────┬──────────┬──────────┘
-   │       │         │          │          │
-┌──▼──┐ ┌──▼──┐ ┌───▼───┐ ┌───▼──┐ ┌──────▼──────┐
-│Auth │ │Acad │ │Finance│ │Place │ │AI RAG       │
-│Svc  │ │Svc  │ │Svc    │ │Svc   │ │Chatbot Svc  │
-└──┬──┘ └──┬──┘ └───┬───┘ └───┬──┘ └──────┬──────┘
-   │       │         │          │           │
-┌──▼───────▼─────────▼──────────▼───────────▼───────┐
-│   PostgreSQL 16  ·  Redis Cache  ·  ChromaDB        │
-│   (Partitioned · RLS · pgvector · Read Replicas)    │
-└────────────────────────────────────────────────────┘
+                                 ┌─────────────────────────────────────────┐
+                                 │     GRI React Native App (Android)      │
+                                 │   Student · Faculty · Parent · Alumni   │
+                                 └────────────────────┬────────────────────┘
+                                                      │ HTTPS / WSS (Axios + MMKV Cache)
+                                 ┌────────────────────▼────────────────────┐
+                                 │          Kong API Gateway / Auth        │
+                                 └────────────────────┬────────────────────┘
+                                                      │
+         ┌────────────────────────┬───────────────────┼───────────────────┬────────────────────────┐
+         │                        │                   │                   │                        │
+┌────────▼─────────┐    ┌─────────▼────────┐  ┌───────▼────────┐ ┌────────▼────────┐    ┌───────────▼───────────┐
+│ Academic Service │    │ Exam/ERP Bridge  │  │ Finance Gateway│ │ AI RAG Microservice│ │ Outreach/Survey Svc   │
+└────────┬─────────┘    └─────────┬────────┘  └───────┬────────┘ └────────┬────────┘    └───────────┬───────────┘
+         │                        │                   │                   │                        │
+┌────────▼────────────────────────▼───────────────────▼───────────────────▼────────────────────────▼───────────┐
+│                                 PostgreSQL 16 Cluster + Redis Cache + PGVector                             │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🛠️ Tech Stack
-
-### Frontend
-| Technology | Purpose |
-|---|---|
-| Flutter 3.x (Dart) | Cross-platform UI — Android, iOS, Web |
-| Riverpod / Bloc | State Management |
-| GoRouter | Navigation & Deep Links |
-| flutter_local_notifications | Local push notifications |
-| firebase_messaging | FCM push notifications |
-| hive / isar | Local offline-first storage |
-| google_maps_flutter | Campus map & transport tracking |
-
-### Backend
-| Technology | Purpose |
-|---|---|
-| Node.js 20 + Express | Primary REST API gateway |
-| Python 3.11 + FastAPI | AI/ML microservices |
-| Apache Airflow 2.9 | ETL & data pipeline orchestration |
-| Scrapy + Playwright | Web data collection |
-
-### Database & Storage
-| Technology | Purpose |
-|---|---|
-| PostgreSQL 16 + pgvector | Primary relational DB + AI embeddings |
-| Redis 7 | Session cache, rate limiting, pub/sub |
-| ChromaDB | Vector store for RAG knowledge base |
-| MinIO | S3-compatible document & image storage |
-
-### AI / ML
-| Technology | Purpose |
-|---|---|
-| LangChain 0.2 | RAG pipeline orchestration |
-| Sentence Transformers (MiniLM-L6-v2) | Document embedding |
-| Gemini / GPT-4o API | LLM for chatbot responses |
-| PyMuPDF | PDF text extraction |
-
-### DevOps & Cloud
-| Technology | Purpose |
-|---|---|
-| Docker + Kubernetes | Containerization & orchestration |
-| GitHub Actions | CI/CD pipelines |
-| AWS / GCP | Cloud infrastructure |
-| Prometheus + Grafana | Monitoring & alerting |
-| ELK Stack | Centralized logging |
-
----
-
-## 📂 Repository Structure
+## 📁 Repository Directory Structure
 
 ```
 GRI/
-├── 📁 lib/                          # Flutter Dart source code
-│   ├── core/                        # App constants, themes, utilities
-│   ├── models/                      # Data models
-│   ├── providers/                   # Riverpod / Bloc state providers
-│   ├── repositories/                # Data access layer
-│   ├── routes/                      # App routing (GoRouter)
-│   ├── screens/                     # UI screens
-│   └── widgets/                     # Reusable UI components
-│
-├── 📁 docs/                         # Project documentation
-│   ├── srs_specification.md         # Software Requirement Specification
-│   └── database/
-│       └── schema.sql               # Full PostgreSQL schema
-│
-├── 📁 research/                     # Research & data artifacts
-│   └── data_collection/
-│       ├── scrapers/                # BS4, Scrapy, Playwright scrapers
-│       ├── etl/                     # Apache Airflow DAG
-│       ├── schemas/                 # JSON schemas
-│       └── data_collection_blueprint.md
-│
-├── 📁 android/                      # Android platform files
-├── 📁 ios/                          # iOS platform files
-├── 📁 web/                          # Web platform files
-├── 📁 assets/                       # App assets (images, JSON, fonts)
-├── 📄 pubspec.yaml                  # Flutter dependencies
-├── 📄 composer.json                 # Project metadata
-├── 📄 README.md                     # This file
-├── 📄 LICENSE                       # MIT License
-└── 📄 .gitignore                    # Git ignore rules
+├── src/
+│   ├── app/                        # Expo Router entry & file-based routes
+│   │   ├── _layout.tsx             # Root Layout with QueryClient & SafeArea
+│   │   ├── index.tsx               # Welcome screen
+│   │   └── (tabs)/                 # Bottom tab bar routes
+│   ├── core/                       # Core system modules
+│   │   ├── api/                    # Axios instance, interceptors, retry
+│   │   ├── storage/                # MMKV storage wrapper
+│   │   ├── auth/                   # Zustand auth store, biometric login
+│   │   ├── theme/                  # NativeWind Tailwind tokens
+│   │   └── telemetry/              # Sentry error & performance logger
+│   ├── features/                   # Feature domain modules
+│   │   ├── academics/              # Timetable, Attendance, Courses
+│   │   ├── examinations/           # Hall Tickets, Results
+│   │   ├── finance/                # Fee Payments, Receipts
+│   │   ├── library/                # OPAC Search, RFID
+│   │   ├── hostel/                 # Out-Pass Management Workflow
+│   │   ├── placement/              # Drives, Resume Builder
+│   │   ├── ai_assistant/           # RAG Vector Chatbot (Tamil & Eng)
+│   │   ├── outreach/               # Geo-tagged Village Surveys
+│   │   ├── transport/              # Bus Tracking
+│   │   └── complaints/             # Grievance Escalation Portal
+│   └── components/                 # Reusable NativeWind UI Primitives
+├── docs/                           # 26 Enterprise Architectural Specs
+├── package.json                    # Dependencies & NPM scripts
+├── tsconfig.json                   # TypeScript config & path aliases
+├── app.json                        # Expo SDK 51 Android configuration
+├── babel.config.js                 # Babel NativeWind & Reanimated plugins
+└── tailwind.config.js              # NativeWind theme tokens
 ```
 
 ---
 
-## 🚀 Getting Started
+## 📑 Complete Documentation Suite Index
 
-### Prerequisites
-- [Flutter SDK 3.x](https://flutter.dev/docs/get-started/install)
-- [Dart SDK 3.x](https://dart.dev/get-dart)
-- [Android Studio / VS Code](https://flutter.dev/docs/get-started/editor)
-- [PostgreSQL 16](https://www.postgresql.org/download/)
-- [Python 3.11+](https://www.python.org/downloads/)
-- [Node.js 20+](https://nodejs.org/)
+| # | Specification Document | Description |
+|:---:|---|---|
+| 01 | [Project Overview](docs/Project_Overview.md) | Vision, scope, Android target specs, user personas |
+| 02 | [System Architecture](docs/Architecture.md) | Feature-first React Native architecture & data flow |
+| 03 | [Folder Structure](docs/Folder_Structure.md) | `src/` directory layout and modular boundaries |
+| 04 | [Coding Standards](docs/Coding_Standards.md) | TypeScript strict standards, ESLint, Prettier rules |
+| 05 | [API Standards](docs/API_Standards.md) | Axios clients, RESTful endpoints, Zod DTO validation |
+| 06 | [State Management](docs/State_Management.md) | Zustand stores + TanStack Query async state management |
+| 07 | [Navigation](docs/Navigation.md) | Expo Router file-based routing, stack/tab/drawer shells, deep links |
+| 08 | [UI System](docs/UI_System.md) | NativeWind v4 styling, Material 3 primitives, Reanimated 60fps animations |
+| 09 | [Design Tokens](docs/Design_Tokens.md) | Tailwind color tokens, typography scales, spacing grids |
+| 10 | [Backend Services](docs/Backend.md) | Axios consumption of Node.js / Python microservices & Kong gateway |
+| 11 | [Authentication](docs/Authentication.md) | OAuth2 / JWT refresh, MMKV Android Keystore encryption, Android Biometrics |
+| 12 | [Database Design](docs/Database.md) | MMKV local storage, SQLite / WatermelonDB, PostgreSQL backend schema |
+| 13 | [AI & RAG System](docs/RAG.md) | React Native AI chat client, streaming responses, bilingual NLU |
+| 14 | [ERP Integration](docs/ERP_Integration.md) | Legacy ERP API adapters consumed via React Query |
+| 15 | [Offline Strategy](docs/Offline_Strategy.md) | TanStack Query offline persistence, MMKV cache, background sync |
+| 16 | [Security Architecture](docs/Security.md) | Android ProGuard / R8 obfuscation, SSL pinning, root detection |
+| 17 | [Deployment & CI/CD](docs/Deployment.md) | Gradle release builds (`./gradlew assembleRelease`), Google Play publishing |
+| 18 | [Testing Strategy](docs/Testing.md) | Jest unit tests, React Native Testing Library component tests, Detox E2E |
+| 19 | [Scalability & Performance](docs/Scalability.md) | Android RAM / Garbage Collection optimization, FlashList tuning |
+| 20 | [Monitoring & APM](docs/Monitoring.md) | Sentry React Native Android crash reporting (ANRs, uncaught JS exceptions) |
+| 21 | [Analytics & Telemetry](docs/Analytics.md) | Privacy-compliant Android telemetry & event tracking |
+| 22 | [Plugin Architecture](docs/Plugin_System.md) | Modular dynamic feature plugin registry for campus clubs |
+| 23 | [Release Roadmap](docs/Roadmap.md) | Multi-phase React Native Android migration & release schedule |
+| 24 | [Developer Guide](docs/Developer_Guide.md) | Onboarding guide, `npx expo run:android`, ADB commands |
+| 25 | [Contributing Rules](docs/Contributing.md) | GitFlow branching, PR templates, ESLint/Prettier verification |
 
-### Flutter Setup
+---
+
+## ⚡ Quick Start for Android Development
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/vijaymahes9080/GRI.git
-cd GRI
+# 1. Install dependencies
+npm install
 
-# 2. Install Flutter dependencies
-flutter pub get
+# 2. Start Expo dev server
+npm start
 
-# 3. Generate platform files (if needed)
-flutter create --platforms android,ios,web .
-
-# 4. Run on device / emulator
-flutter run
-
-# 5. Run on Web
-flutter run -d chrome
-```
-
-### Database Setup
-
-```bash
-# 1. Create PostgreSQL database
-createdb gri_db
-
-# 2. Run the schema
-psql -U postgres -d gri_db -f docs/database/schema.sql
-
-# 3. Verify extensions
-psql -U postgres -d gri_db -c "\dx"
-```
-
-### Data Collection Setup
-
-```bash
-# 1. Install Python dependencies
-cd research/data_collection
-pip install -r requirements.txt
-
-# 2. Install Playwright browsers
-playwright install chromium
-
-# 3. Run BeautifulSoup4 scraper
-python scrapers/gri_bs4_parser.py
-
-# 4. Run Playwright scraper
-python scrapers/gri_playwright_spider.py
-
-# 5. Run Scrapy spider
-scrapy crawl gri_spider -O data/scrapy_output.json
+# 3. Run directly on connected Android device / emulator
+npm run android
 ```
 
 ---
 
-## 🔒 Security
+## 📄 License
 
-- All sensitive data encrypted with **AES-256** at rest; **TLS 1.3** in transit.
-- Authentication via **OAuth 2.0 + JWT** with refresh token rotation.
-- **Row-Level Security (RLS)** enforced at the PostgreSQL layer.
-- **OWASP Top 10** mitigations applied across all API endpoints.
-- Compliant with **Indian DPDP Act 2023**.
-
----
-
-## 🤝 Contributing
-
-This is an official academic project for Gandhigram Rural Institute. Contributions are welcomed from GRI community members.
-
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -m "feat: your descriptive message"`
-4. Push: `git push origin feature/your-feature-name`
-5. Open a Pull Request.
-
----
-
-## 👨‍💻 Author
-
-| Field | Detail |
-|---|---|
-| **Name** | Vijay Mahes |
-| **Email** | [Vijaypradhap2004@gmail.com](mailto:Vijaypradhap2004@gmail.com) |
-| **GitHub** | [@vijaymahes9080](https://github.com/vijaymahes9080) |
-| **Repository** | [github.com/vijaymahes9080/GRI](https://github.com/vijaymahes9080/GRI) |
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for full details.
-
----
-
-<div align="center">
-
-**Gandhigram Rural Institute – Deemed to be University**  
-Gandhigram, Dindigul – 624 302, Tamil Nadu, India  
-🌐 [ruraluniv.ac.in](https://ruraluniv.ac.in) · 📧 [info@ruraluniv.ac.in](mailto:info@ruraluniv.ac.in)
-
-*"Combining Higher Education with Rural Reconstruction"*
-
-</div>
+Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
