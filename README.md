@@ -64,7 +64,7 @@ flowchart LR
     S11 --> S12([⏳ Stage 12\nTesting])
     S12 --> S13([✅ Stage 13\nCloud Deploy])
     S13 --> S14([✅ Stage 14\nScalability])
-    S14 --> S15([⏳ Stage 15\nMaintenance])
+    S14 --> S15([✅ Stage 15\nMaintenance])
 ```
 
 | Stage | Title | Status | Docs |
@@ -83,7 +83,7 @@ flowchart LR
 | 12 | Testing & QA | ⏳ Pending | — |
 | 13 | Cloud Deployment | ✅ Complete | [Cloud Deployment Architecture](docs/cloud_deployment_architecture.md) |
 | 14 | Scalability | ✅ Complete | [Scalability Architecture](docs/scalability_reliability_architecture.md) |
-| 15 | Maintenance & Expansion | ⏳ Pending | — |
+| 15 | Maintenance & Expansion | ✅ Complete | [Future Expansion Architecture](docs/future_expansion_architecture.md) |
 
 ---
 
