@@ -58,7 +58,7 @@ flowchart LR
     S5 --> S6([✅ Stage 6\nBackend APIs])
     S6 --> S7([✅ Stage 7\nAuthentication])
     S7 --> S8([✅ Stage 8\nAI Chatbot + RAG])
-    S8 --> S9([⏳ Stage 9\nERP Integration])
+    S8 --> S9([✅ Stage 9\nERP Integration])
     S9 --> S10([⏳ Stage 10\nNotifications])
     S10 --> S11([⏳ Stage 11\nSecurity])
     S11 --> S12([⏳ Stage 12\nTesting])
@@ -77,7 +77,7 @@ flowchart LR
 | 6 | Backend APIs | ✅ Complete | [Backend Architecture](docs/backend_architecture.md) |
 | 7 | Authentication | ✅ Complete | [Authentication Architecture](docs/authentication_architecture.md) |
 | 8 | AI Chatbot + RAG | ✅ Complete | [AI RAG Architecture](docs/ai_rag_architecture.md) |
-| 9 | ERP Integration | ⏳ Pending | — |
+| 9 | ERP Integration | ✅ Complete | [ERP Integration Architecture](docs/erp_integration_architecture.md) |
 | 10 | Notifications | ⏳ Pending | — |
 | 11 | Security & Compliance | ⏳ Pending | — |
 | 12 | Testing & QA | ⏳ Pending | — |
