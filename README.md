@@ -32,6 +32,7 @@ flowchart TD
 - Stakeholder discovery & needs assessment for students, faculty, administration, and alumni.
 - Scope definition for cross-platform app (Android, iOS, Web).
 - Definition of Functional & Non-Functional Requirements (SLA, uptime, security, accessibility).
+- 📄 **Full Specification**: See [Software Requirement Specification (SRS)](file:///d:/current%20project/GRI/docs/srs_specification.md) for complete actors, use cases, DFDs, ERD, and risk matrix.
 
 ### Stage 2: Website Data Collection
 - Web scraping & data ingestion from existing GRI web portals.
