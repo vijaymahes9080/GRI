@@ -4,14 +4,8 @@
     "slug": "gri-mobile-android",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "gri",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0D47A1"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -19,10 +13,6 @@
       "supportsTablet": false
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0D47A1"
-      },
       "package": "in.ac.ruraluniv.gri",
       "permissions": [
         "CAMERA",

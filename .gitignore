@@ -368,3 +368,7 @@ temp/
 
 # Keep source assets, ignore generated variants
 # assets/generated/
+
+# Expo Cache
+.expo/
+
