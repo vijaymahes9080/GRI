@@ -15,6 +15,7 @@ from backend.app.api.v1.endpoints import (
     examinations,
     hostel,
     ai_analytics,
+    websockets,
 )
 
 app = FastAPI(
@@ -55,6 +56,7 @@ app.include_router(erp.router, prefix=f"{settings.API_V1_STR}/erp", tags=["ERP M
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
+app.include_router(websockets.router, prefix="", tags=["Real-time WebSockets"])
 
 @app.get("/health", tags=["Health"])
 async def health_check():
