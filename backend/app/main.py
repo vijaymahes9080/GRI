@@ -30,6 +30,7 @@ app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Aut
 app.include_router(oauth.router, prefix=f"{settings.API_V1_STR}/oauth", tags=["OAuth, OTP & MFA"])
 app.include_router(rag.router, prefix=f"{settings.API_V1_STR}/rag", tags=["AI Chatbot & RAG Engine"])
 app.include_router(erp.router, prefix=f"{settings.API_V1_STR}/erp", tags=["ERP Middleware & Webhooks"])
+app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
 
