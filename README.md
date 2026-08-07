@@ -55,8 +55,8 @@ flowchart LR
     S2 --> S3([✅ Stage 3\nDatabase Design])
     S3 --> S4([🔄 Stage 4\nUI/UX Design])
     S4 --> S5([⏳ Stage 5\nFlutter Dev])
-    S5 --> S6([⏳ Stage 6\nBackend APIs])
-    S6 --> S7([⏳ Stage 7\nAuthentication])
+    S5 --> S6([✅ Stage 6\nBackend APIs])
+    S6 --> S7([✅ Stage 7\nAuthentication])
     S7 --> S8([⏳ Stage 8\nAI Chatbot + RAG])
     S8 --> S9([⏳ Stage 9\nERP Integration])
     S9 --> S10([⏳ Stage 10\nNotifications])
@@ -75,7 +75,7 @@ flowchart LR
 | 4 | UI/UX Design | ✅ Complete | [UI/UX Specification](docs/ui_ux/ui_ux_specification.md) |
 | 5 | Flutter Development | ✅ Complete | [Flutter Architecture](docs/flutter_architecture.md) |
 | 6 | Backend APIs | ✅ Complete | [Backend Architecture](docs/backend_architecture.md) |
-| 7 | Authentication | ⏳ Pending | — |
+| 7 | Authentication | ✅ Complete | [Authentication Architecture](docs/authentication_architecture.md) |
 | 8 | AI Chatbot + RAG | ⏳ Pending | — |
 | 9 | ERP Integration | ⏳ Pending | — |
 | 10 | Notifications | ⏳ Pending | — |

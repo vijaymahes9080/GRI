@@ -27,6 +27,7 @@ Instrumentator().instrument(app).expose(app)
 
 # Include Routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
+app.include_router(oauth.router, prefix=f"{settings.API_V1_STR}/oauth", tags=["OAuth, OTP & MFA"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
 
