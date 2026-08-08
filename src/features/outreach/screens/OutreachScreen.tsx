@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
-import { MapPin, Camera, CheckCircle2 } from 'lucide-react-native';
+import { MapPin, Camera } from 'lucide-react-native';
 
 import { Header } from '../../../components/Header';
 import { Card } from '../../../components/Card';

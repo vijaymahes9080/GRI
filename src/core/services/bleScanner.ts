@@ -21,7 +21,7 @@ export const requestAndroidBlePermissions = async (): Promise<boolean> => {
       granted['android.permission.ACCESS_FINE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED &&
       granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED
     );
-  } catch (err) {
+  } catch {
     return false;
   }
 };

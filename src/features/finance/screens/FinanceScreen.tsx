@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import { CreditCard, Download, CheckCircle2, ShieldCheck } from 'lucide-react-native';
+import { CreditCard, Download } from 'lucide-react-native';
 
 import { Header } from '../../../components/Header';
 import { Card } from '../../../components/Card';

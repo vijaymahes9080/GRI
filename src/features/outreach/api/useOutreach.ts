@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '../../../core/api';
 import { enqueueOfflineAction } from '../../../core/offline/syncQueue';
 
@@ -17,7 +17,7 @@ export const useSubmitSurvey = () => {
       try {
         const response = await apiClient.post('/outreach/surveys', payload);
         return response.data;
-      } catch (error) {
+      } catch {
         // Enqueue offline action if network fails
         enqueueOfflineAction('/outreach/surveys', 'POST', payload);
         return { success: true, offlineQueued: true, message: 'Saved to offline sync queue' };

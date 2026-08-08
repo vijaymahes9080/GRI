@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
-import { Briefcase, Calendar, CheckCircle2, FileText } from 'lucide-react-native';
+import { Calendar, FileText } from 'lucide-react-native';
 
 import { Header } from '../../../components/Header';
 import { Card } from '../../../components/Card';

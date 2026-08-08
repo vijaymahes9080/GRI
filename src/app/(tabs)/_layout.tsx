@@ -1,23 +1,23 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Home, BookOpen, FileCheck, Building2, Bot, User } from 'lucide-react-native';
+import { Home, BookOpen, Layers, Compass, Bot, User } from 'lucide-react-native';
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#0D47A1',
+        tabBarActiveTintColor: '#518214',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopColor: '#E5E7EB',
-          height: 60,
+          height: 62,
           paddingBottom: 8,
           paddingTop: 6,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
         },
       }}
@@ -37,17 +37,17 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="examinations"
+        name="services"
         options={{
-          title: 'Exams',
-          tabBarIcon: ({ color, size }) => <FileCheck size={size} color={color} />,
+          title: 'Services',
+          tabBarIcon: ({ color, size }) => <Layers size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="hostel"
+        name="discover"
         options={{
-          title: 'Hostel',
-          tabBarIcon: ({ color, size }) => <Building2 size={size} color={color} />,
+          title: 'Discover',
+          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -62,6 +62,24 @@ export default function TabsLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="examinations"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="hostel"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

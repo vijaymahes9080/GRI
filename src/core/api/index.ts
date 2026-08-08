@@ -62,7 +62,7 @@ apiClient.interceptors.response.use(
 
             return apiClient(originalRequest);
           }
-        } catch (refreshError) {
+        } catch {
           // Token refresh failed -> Clear session
           storage.delete(storageKeys.ACCESS_TOKEN);
           storage.delete(storageKeys.REFRESH_TOKEN);

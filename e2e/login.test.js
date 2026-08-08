@@ -1,3 +1,4 @@
+/* global describe, beforeAll, beforeEach, it, expect, device, element, by */
 describe('GRI Mobile Portal E2E Flow', () => {
   beforeAll(async () => {
     await device.launchApp();

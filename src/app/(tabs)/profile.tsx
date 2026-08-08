@@ -5,11 +5,12 @@ import { User, ShieldCheck, Bell, Lock, HelpCircle, LogOut, ChevronRight } from 
 
 import { Header } from '../../components/Header';
 import { Card } from '../../components/Card';
-import { useAuthStore } from '../../core/auth/authStore';
+import { useAuthStore, UserRole } from '../../core/auth/authStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUser } = useAuthStore();
+  const [showRoleModal, setShowRoleModal] = React.useState(false);
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out of GRI Portal?', [
@@ -25,27 +26,46 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const allRoles: { role: UserRole; title: string; desc: string }[] = [
+    { role: 'STUDENT', title: 'Student', desc: 'Attendance, Grades, Fees & Hall Ticket' },
+    { role: 'FACULTY', title: 'Faculty', desc: 'Class Attendance, CFA Marks & Roster' },
+    { role: 'RESEARCH_SCHOLAR', title: 'Research Scholar', desc: 'Ph.D. Progress, Thesis & Fellowship' },
+    { role: 'DEPARTMENT_ADMIN', title: 'Department Admin', desc: 'Departmental Notices & Timetables' },
+    { role: 'EXAM_STAFF', title: 'Exam Staff', desc: 'Seating, Exam Schedules & Revaluation' },
+    { role: 'HOSTEL_STAFF', title: 'Hostel Warden', desc: 'Outpass Approvals & Mess Fees' },
+    { role: 'FINANCE_STAFF', title: 'Finance Staff', desc: 'Fee Ledger & Payment Receipts' },
+    { role: 'UNIVERSITY_ADMIN', title: 'University Admin', desc: 'University Dashboard & Content CMS' },
+    { role: 'LIBRARIAN', title: 'Librarian', desc: 'OPAC Search & Book Transactions' },
+    { role: 'PLACEMENT_OFFICER', title: 'Placement Officer', desc: 'Campus Drives & Interviews' },
+    { role: 'ALUMNI', title: 'Alumni', desc: 'Networking, Events & Mentorship' },
+    { role: 'PENSIONER', title: 'Pensioner', desc: 'Life Certificate & Pension Status' },
+    { role: 'SYSTEM_ADMIN', title: 'System Admin', desc: 'RBAC Permissions & Audit Logs' },
+  ];
+
   const menuItems = [
-    { title: 'Security & Biometrics', icon: ShieldCheck, route: 'biometrics' },
-    { title: 'Notification Preferences', icon: Bell, route: 'notifications' },
-    { title: 'Change Password', icon: Lock, route: 'password' },
-    { title: 'Help & Grievance Portal', icon: HelpCircle, route: 'support' },
+    { title: 'Switch Active Role (RBAC)', icon: ShieldCheck, action: () => setShowRoleModal(true) },
+    { title: 'Security & Biometrics', icon: Lock, action: () => Alert.alert('Biometrics', 'Fingerprint & FaceID enabled') },
+    { title: 'Notification Preferences', icon: Bell, action: () => Alert.alert('Notifications', 'Push & In-App alerts enabled') },
+    { title: 'Help & Grievance Portal', icon: HelpCircle, action: () => router.push('/(tabs)/services' as any) },
   ];
 
   return (
     <View className="flex-1 bg-gray-50">
-      <Header title="My Profile" subtitle="Account Settings" />
+      <Header title="My Profile" subtitle="GRI Unified Identity & Settings" variant="green" />
 
       <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
         {/* User Card */}
-        <Card className="p-5 mb-5 border-gray-100 flex-row items-center">
-          <View className="bg-khadi-blue p-4 rounded-full mr-4">
+        <Card className="p-5 mb-5 border-gray-200 bg-white flex-row items-center shadow-sm">
+          <View className="bg-[#518214] p-4 rounded-full mr-4">
             <User size={32} color="#FFFFFF" />
           </View>
           <View className="flex-1">
             <Text className="text-lg font-bold text-gray-900">{user?.fullName || 'Vijay Maheswari'}</Text>
-            <Text className="text-xs text-gray-500 font-medium">{user?.department || 'Computer Science'}</Text>
-            <Text className="text-xs font-semibold text-khadi-blue mt-1">Roll: {user?.rollNumber || 'GRI-2024-8841'}</Text>
+            <View className="bg-[#911C03] px-2.5 py-0.5 rounded-full align-self-start mt-1 mb-1">
+              <Text className="text-[10px] font-bold text-white uppercase">{user?.role || 'STUDENT'}</Text>
+            </View>
+            <Text className="text-xs text-gray-500 font-medium">{user?.department || 'Computer Science & Applications'}</Text>
+            <Text className="text-xs font-semibold text-[#518214] mt-0.5">ID: {user?.rollNumber || 'GRI-2024-8841'}</Text>
           </View>
         </Card>
 
@@ -57,13 +77,13 @@ export default function ProfileScreen() {
           return (
             <TouchableOpacity
               key={idx}
-              onPress={() => Alert.alert(item.title, 'Navigating to ' + item.title)}
-              className="bg-white p-4 rounded-2xl border border-gray-100 mb-3 flex-row items-center justify-between"
+              onPress={item.action}
+              className="bg-white p-4 rounded-2xl border border-gray-200 mb-3 flex-row items-center justify-between shadow-sm"
               activeOpacity={0.7}
             >
               <View className="flex-row items-center">
-                <View className="bg-blue-50 p-2.5 rounded-xl mr-3">
-                  <Icon size={20} color="#0D47A1" />
+                <View className="bg-emerald-50 p-2.5 rounded-xl mr-3">
+                  <Icon size={20} color="#518214" />
                 </View>
                 <Text className="text-base font-semibold text-gray-800">{item.title}</Text>
               </View>
@@ -75,7 +95,7 @@ export default function ProfileScreen() {
         {/* Logout Button */}
         <TouchableOpacity
           onPress={handleLogout}
-          className="bg-red-50 border border-red-200 p-4 rounded-2xl mt-4 flex-row items-center justify-center"
+          className="bg-red-50 border border-red-200 p-4 rounded-2xl mt-4 flex-row items-center justify-center shadow-sm"
           activeOpacity={0.7}
         >
           <LogOut size={20} color="#D32F2F" />
@@ -84,6 +104,49 @@ export default function ProfileScreen() {
 
         <View className="h-8" />
       </ScrollView>
+
+      {/* Role Switcher Modal */}
+      <React.Fragment>
+        {showRoleModal && (
+          <View className="absolute inset-0 bg-black/60 items-center justify-center p-5 z-50">
+            <View className="bg-white w-full max-w-md rounded-3xl p-5 max-h-[80%]">
+              <Text className="text-xl font-bold text-gray-900 mb-1 text-center">Select Active User Role</Text>
+              <Text className="text-xs text-gray-500 mb-4 text-center">
+                Test role-based access control (RBAC) permissions across GRI One
+              </Text>
+
+              <ScrollView className="space-y-2 mb-4" showsVerticalScrollIndicator={false}>
+                {allRoles.map((r, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => {
+                      updateUser({ role: r.role });
+                      setShowRoleModal(false);
+                      Alert.alert('Role Updated', `Active role switched to ${r.title}`);
+                    }}
+                    className={`p-3.5 rounded-xl border mb-2 flex-row items-center justify-between ${
+                      user?.role === r.role ? 'bg-emerald-50 border-[#518214]' : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <View className="flex-1 pr-2">
+                      <Text className="text-sm font-bold text-gray-900">{r.title}</Text>
+                      <Text className="text-xs text-gray-500 mt-0.5">{r.desc}</Text>
+                    </View>
+                    {user?.role === r.role && <ShieldCheck size={20} color="#518214" />}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                onPress={() => setShowRoleModal(false)}
+                className="bg-gray-200 p-3.5 rounded-xl items-center"
+              >
+                <Text className="text-sm font-bold text-gray-800">Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </React.Fragment>
     </View>
   );
 }

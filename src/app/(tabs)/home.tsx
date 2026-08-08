@@ -18,11 +18,9 @@ import {
 
 import { Header } from '../../components/Header';
 import { Card } from '../../components/Card';
-import { useAuthStore } from '../../core/auth/authStore';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
 
   const modules = [
     { title: 'Academics & Attendance', icon: BookOpen, color: '#518214', route: '/(tabs)/academics' },

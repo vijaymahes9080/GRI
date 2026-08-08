@@ -48,7 +48,7 @@ export const processOfflineSyncQueue = async (): Promise<{ successCount: number;
         await apiClient.delete(item.endpoint);
       }
       successCount++;
-    } catch (err) {
+    } catch {
       failCount++;
       if (item.retries < 5) {
         remainingItems.push({ ...item, retries: item.retries + 1 });

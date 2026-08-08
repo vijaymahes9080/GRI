@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { Radio, Clock, CheckCircle2, BookOpen } from 'lucide-react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
+import { Radio, Clock, BookOpen } from 'lucide-react-native';
 
 import { Header } from '../../components/Header';
 import { Card } from '../../components/Card';
