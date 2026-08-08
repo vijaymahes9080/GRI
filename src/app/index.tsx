@@ -19,7 +19,7 @@ export default function WelcomeScreen() {
       </Text>
 
       <TouchableOpacity
-        onPress={() => router.push('/(tabs)')}
+        onPress={() => router.replace('/(tabs)/home')}
         className="flex-row items-center bg-saffron px-8 py-4 rounded-xl shadow-lg"
         activeOpacity={0.8}
       >

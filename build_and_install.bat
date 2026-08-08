@@ -32,10 +32,13 @@ adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo Launching GRI Mobile app...
+    echo Launching Metro bundler server and GRI Mobile app...
+    start "GRI Metro Bundler" cmd /k "npx expo start --localhost"
+    ping 127.0.0.1 -n 4 > nul
     adb shell monkey -p in.ac.ruraluniv.gri -c android.intent.category.LAUNCHER 1 > nul 2>&1
     echo.
     echo SUCCESS: Build and USB deployment completed!
+    echo TIP: If phone shows "Unable to load script", wait 3 seconds for Metro bundler to finish loading and tap "RELOAD" on your phone.
 ) else (
     echo.
     echo [ERROR] Installation failed. Ensure phone is connected with USB Debugging enabled.

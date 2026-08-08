@@ -14,4 +14,5 @@ module.exports = {
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
   ],
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
 };

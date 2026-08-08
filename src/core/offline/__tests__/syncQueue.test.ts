@@ -1,6 +1,6 @@
 import { getSyncQueue, enqueueOfflineAction } from '../syncQueue';
 
-jest.mock('../storage', () => {
+jest.mock('../../storage', () => {
   let mockStore: Record<string, any> = {};
   return {
     getItem: (key: string) => mockStore[key] || null,
