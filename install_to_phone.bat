@@ -13,8 +13,9 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo [2/4] Aligning APK for 16KB Page Size (ELE Check)...
+echo [2/4] Aligning and Signing APK for 16KB Page Size (ELE Check)...
 "%ANDROID_HOME%\build-tools\34.0.0\zipalign.exe" -f -p 4 "%~dp0android\app\build\outputs\apk\debug\app-debug.apk" "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
+call "%ANDROID_HOME%\build-tools\34.0.0\apksigner.bat" sign --ks "%~dp0android\app\debug.keystore" --ks-pass pass:android --key-pass pass:android "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
 
 echo.
 echo [3/4] Installing 16KB-aligned APK onto connected Android phone...
