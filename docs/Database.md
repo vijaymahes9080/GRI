@@ -14,24 +14,15 @@ export const mmkvStorage = new MMKV({
 
 ---
 
-## 2. Remote Database Schema (PostgreSQL 16)
+---
 
-```sql
-CREATE TABLE students (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    roll_number VARCHAR(30) UNIQUE NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    department_code VARCHAR(10) NOT NULL,
-    current_semester INT NOT NULL DEFAULT 1,
-    cgpa NUMERIC(3, 2) DEFAULT 0.00
-);
+## 3. Remote Database Schema Extensions (PostgreSQL 16 Schema v2)
 
-CREATE TABLE attendance_records (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
-    course_code VARCHAR(20) NOT NULL,
-    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(10) CHECK (status IN ('PRESENT', 'ABSENT', 'LATE')),
-    ble_beacon_id VARCHAR(50) NOT NULL
-);
-```
+Refer to [database/schema_v2_extension.sql](file:///d:/current%20project/GRI/database/schema_v2_extension.sql):
+
+- **`core.app_config`**: Remote versioning, maintenance status, theme tokens.
+- **`core.feature_flags`**: Feature toggles (`admissions`, `examinations`, `results`, `departments`, `faculty`, `news`).
+- **`core.navigation_nodes`**: Server-driven navigation structure.
+- **`content.entities`**: Unified content model for announcements, news, events, departments, faculty, admissions, exams, results, documents.
+- **`sync.sync_jobs`**: Ingestion execution log and change detection audits.
+

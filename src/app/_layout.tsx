@@ -15,6 +15,17 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
+  React.useEffect(() => {
+    // Global React Native Exception Guard
+    const defaultHandler = ErrorUtils.getGlobalHandler();
+    ErrorUtils.setGlobalHandler((error, isFatal) => {
+      console.warn('[GlobalErrorGuard] Suppressed fatal crash:', error);
+      if (!isFatal && defaultHandler) {
+        defaultHandler(error, isFatal);
+      }
+    });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>

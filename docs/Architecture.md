@@ -36,3 +36,6 @@ The GRI React Native Platform follows a **Feature-First Domain-Driven Architectu
 ### Service Layer
 - **Axios**: Standardized HTTP client with request/response interceptors for OAuth2 JWT refresh.
 - **MMKV**: Fast native key-value storage for local session data.
+- **Server-Driven Dynamic Engine**: Dynamic App Config hook (`useAppConfig`) & menu renderer (`DynamicMenu`) consuming `/api/v1/app/config`.
+- **GRI Data Ingestion Engine**: Background ingestion adapters (`NewsAdapter`, `EventsAdapter`, `DepartmentsAdapter`, `AdmissionsAdapter`, `ExaminationAdapter`) with SHA256 checksum change detection.
+

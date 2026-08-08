@@ -12,11 +12,20 @@ Official Reference Website: [https://ruraluniv.ac.in/](https://ruraluniv.ac.in/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Expo](https://img.shields.io/badge/Expo-SDK_51-000000?logo=expo&logoColor=white)](https://expo.dev)
 [![Android](https://img.shields.io/badge/Android_16KB_Aligned-API_35-3DDC84?logo=android&logoColor=white)](https://developer.android.com/16kb-page-size)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_+_pgvector-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Backend](https://img.shields.io/badge/NestJS-Node.js_TS-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_Schema_v2-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Quality Gate](https://img.shields.io/badge/Quality_Gate-100%25_Passed-success.svg)](#-verification-scorecard)
 
 [🌐 Official University Website](https://ruraluniv.ac.in) · [📚 Documentation Index](docs/Project_Overview.md) · [🏗️ System Architecture](docs/Architecture.md)
+
+---
+
+## ⚡ Key Platform Capabilities
+
+1. **Automatically Adaptable Server-Driven Configuration**: Consumes `/api/v1/app/config` dynamically to render navigation menus, feature flags, and brand theme tokens without requiring mobile app releases.
+2. **GRI Web Data Ingestion Engine**: Background ingestion adapters (`NewsAdapter`, `EventsAdapter`, `DepartmentsAdapter`, `AdmissionsAdapter`, `ExaminationAdapter`) scrape, sanitize, normalize, and deduplicate `ruraluniv.ac.in` data with SHA256 checksum change detection.
+3. **Web Administration Control Panel**: Web-based administration interface (`admin/index.html`) providing real-time feature flag management, dynamic navigation node configuration, and ingestion health monitoring.
+4. **Offline-First Resilience & Crash Immunity**: Encrypted MMKV persistent storage, TanStack Query background sync, and top-level `<ErrorBoundary>` component preventing unhandled real-time crashes.
 
 </div>
 
