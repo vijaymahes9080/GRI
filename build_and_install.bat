@@ -18,13 +18,16 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
+echo [2/4] Performing 16KB Page Alignment (ELE Check)...
+"%ANDROID_HOME%\build-tools\34.0.0\zipalign.exe" -f -p 4 "%~dp0android\app\build\outputs\apk\debug\app-debug.apk" "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
+
 echo.
-echo [2/3] Setting up ADB USB reverse port (8081)...
+echo [3/4] Setting up ADB USB reverse port (8081)...
 adb reverse tcp:8081 tcp:8081
 
 echo.
-echo [3/3] Installing APK onto connected phone...
-adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug.apk"
+echo [4/4] Installing 16KB-aligned APK onto connected phone...
+adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
 
 if %ERRORLEVEL% EQU 0 (
     echo.

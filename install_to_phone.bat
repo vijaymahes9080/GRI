@@ -4,19 +4,25 @@ echo   GRI Mobile - Push APK to Connected Phone (USB)
 echo ===================================================
 echo.
 
-echo [1/3] Setting up USB reverse port forwarding (8081)...
+set ANDROID_HOME=C:\Users\vijay\AppData\Local\Android\Sdk
+
+echo [1/4] Setting up USB reverse port forwarding (8081)...
 adb reverse tcp:8081 tcp:8081
 if %ERRORLEVEL% NEQ 0 (
     echo [WARNING] ADB reverse failed. Please check USB connection and unlock your phone.
 )
 
 echo.
-echo [2/3] Installing APK onto connected Android phone...
-adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug.apk"
+echo [2/4] Aligning APK for 16KB Page Size (ELE Check)...
+"%ANDROID_HOME%\build-tools\34.0.0\zipalign.exe" -f -p 4 "%~dp0android\app\build\outputs\apk\debug\app-debug.apk" "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
+
+echo.
+echo [3/4] Installing 16KB-aligned APK onto connected Android phone...
+adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo [3/3] Opening GRI Mobile App on your phone...
+    echo [4/4] Opening GRI Mobile App on your phone...
     adb shell monkey -p in.ac.ruraluniv.gri -c android.intent.category.LAUNCHER 1 > nul 2>&1
     echo.
     echo SUCCESS: Application installed and launched cleanly!
