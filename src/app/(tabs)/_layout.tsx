@@ -1,16 +1,19 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Home, BookOpen, Layers, Compass, Bot, User } from 'lucide-react-native';
+import { useAppConfig } from '../../core/config/useAppConfig';
 
 export default function TabsLayout() {
+  const { theme, isFeatureEnabled } = useAppConfig();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#518214',
+        tabBarActiveTintColor: theme?.primaryColor || '#518214',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme?.surfaceColor || '#FFFFFF',
           borderTopColor: '#E5E7EB',
           height: 62,
           paddingBottom: 8,
@@ -33,6 +36,7 @@ export default function TabsLayout() {
         name="academics"
         options={{
           title: 'Academics',
+          href: isFeatureEnabled('departments') ? undefined : null,
           tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
         }}
       />

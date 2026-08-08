@@ -11,6 +11,8 @@ export const storageKeys = {
   USER_DATA: 'user_data',
   THEME_MODE: 'theme_mode',
   BIOMETRIC_ENABLED: 'biometric_enabled',
+  APP_CONFIG: 'server_app_config',
+  FEATURE_FLAGS: 'server_feature_flags',
 } as const;
 
 export const getItem = <T>(key: string): T | null => {

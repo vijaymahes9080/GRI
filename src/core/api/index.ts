@@ -23,6 +23,8 @@ export const apiClient = axios.create({
   },
 });
 
+export const api = apiClient;
+
 // Request Interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
