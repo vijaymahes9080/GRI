@@ -71,7 +71,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Quick Stats Grid */}
-        <View className="flex-row mb-5 space-x-3">
+        <View className="flex-row mb-5 gap-3">
           <View className="flex-1 bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
             <Text className="text-xs text-gray-500 font-medium">Attendance Rate</Text>
             <Text className="text-2xl font-bold text-[#518214] mt-1">92.4%</Text>

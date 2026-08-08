@@ -107,7 +107,7 @@ export default function AiChatScreen() {
       </ScrollView>
 
       {/* Suggested Quick Questions */}
-      <View className="px-4 pb-2 flex-row space-x-2">
+      <View className="px-4 pb-2 flex-row gap-2">
         <TouchableOpacity
           onPress={() => setInput('What is the minimum attendance required?')}
           className="bg-white border border-gray-200 px-3 py-1.5 rounded-full flex-row items-center"

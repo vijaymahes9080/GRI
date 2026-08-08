@@ -63,7 +63,7 @@ export default function ServicesScreen() {
 
         {/* Services List */}
         <Text className="text-lg font-bold text-gray-900 mb-3">All Portal Services</Text>
-        <View className="space-y-3 mb-6">
+        <View className="gap-3 mb-6">
           {services.map((svc, index) => {
             const Icon = svc.icon;
             return (

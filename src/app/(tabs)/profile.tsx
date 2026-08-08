@@ -115,7 +115,7 @@ export default function ProfileScreen() {
                 Test role-based access control (RBAC) permissions across GRI One
               </Text>
 
-              <ScrollView className="space-y-2 mb-4" showsVerticalScrollIndicator={false}>
+              <ScrollView className="gap-2 mb-4" showsVerticalScrollIndicator={false}>
                 {allRoles.map((r, i) => (
                   <TouchableOpacity
                     key={i}
