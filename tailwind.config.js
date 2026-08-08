@@ -5,6 +5,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        gri: {
+          green: "#518214",
+          maroon: "#911C03",
+          saffron: "#F16236",
+          dark: "#1F2937",
+        },
         khadi: {
           blue: "#0D47A1",
           light: "#82B1FF",

@@ -1,7 +1,23 @@
 import { create } from 'zustand';
 import { storage, storageKeys, getItem, setItem, removeItem } from '../storage';
 
-export type UserRole = 'STUDENT' | 'FACULTY' | 'WARDEN' | 'PARENT' | 'ADMIN';
+export type UserRole =
+  | 'STUDENT'
+  | 'FACULTY'
+  | 'RESEARCH_SCHOLAR'
+  | 'DEPARTMENT_ADMIN'
+  | 'EXAM_STAFF'
+  | 'HOSTEL_STAFF'
+  | 'FINANCE_STAFF'
+  | 'UNIVERSITY_ADMIN'
+  | 'LIBRARIAN'
+  | 'PLACEMENT_OFFICER'
+  | 'ALUMNI'
+  | 'PENSIONER'
+  | 'SYSTEM_ADMIN'
+  | 'WARDEN'
+  | 'PARENT'
+  | 'ADMIN';
 
 export interface User {
   id: string;
