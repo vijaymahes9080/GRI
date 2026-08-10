@@ -58,6 +58,23 @@ export default function DiscoverScreen() {
           />
         </View>
 
+        {/* Dedicated Navigation Page Banner */}
+        <TouchableOpacity
+          onPress={() => router.push('/navigation')}
+          className="bg-[#518214] p-3.5 rounded-2xl mb-4 flex-row items-center justify-between shadow-sm"
+        >
+          <View className="flex-row items-center flex-1 pr-2">
+            <Compass size={22} color="#FFFFFF" />
+            <View className="ml-3 flex-1">
+              <Text className="text-sm font-bold text-white">Full GRI Navigation Directory</Text>
+              <Text className="text-[11px] text-emerald-100 font-medium">Browse all 16 categories & 150+ portal links</Text>
+            </View>
+          </View>
+          <View className="bg-white/20 px-2.5 py-1 rounded-lg">
+            <Text className="text-xs font-bold text-white">OPEN →</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* Dynamic Category Selector Bar */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
           {[
