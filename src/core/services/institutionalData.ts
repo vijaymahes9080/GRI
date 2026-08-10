@@ -175,4 +175,50 @@ export const GRI_INSTITUTIONAL_DATA = {
     { title: 'Sanitation Works Manual', category: 'SANITATION', pdfUrl: `${GRI_BASE_URL}/includes/manual/sanitation.pdf`, routeTag: 'tag:manual:sanitation' },
     { title: 'Examination System Manual', category: 'EXAMINATION', pdfUrl: `${GRI_BASE_URL}/includes/examination/pdf/ExaminationSystem.pdf`, routeTag: 'tag:manual:examination' },
   ],
+
+  circulars: [
+    { id: 'c1', title: 'End Semester Examination Schedule May 2026', category: 'EXAM', publishDate: '2026-05-02', isImportant: true, pdfUrl: `${GRI_BASE_URL}/circulars/ese_may_2026.pdf` },
+    { id: 'c2', title: 'Admissions 2026-27 Open for UG & PG Programmes via CUET', category: 'ADMISSIONS', publishDate: '2026-04-28', isImportant: true, pdfUrl: `${GRI_BASE_URL}/admissions/prospectus_2026.pdf` },
+    { id: 'c3', title: 'Unnat Bharat Abhiyan (UBA) Rural Extension Camp Schedule', category: 'OUTREACH', publishDate: '2026-04-20', isImportant: false, pdfUrl: `${GRI_BASE_URL}/uba/camp_notice.pdf` },
+  ],
+
+  events: [
+    { id: 'e1', title: 'National Conference on Sustainable Rural Technologies & Green Energy', organizer: 'School of Engineering & Technology & REC', eventDate: '2026-08-25', venue: 'Multipurpose Auditorium, GRI Campus', category: 'CONFERENCE', link: `${GRI_BASE_URL}/events/ncsrt2026` },
+    { id: 'e2', title: 'Unnat Bharat Abhiyan Village Adoption & Health Camp', organizer: 'UBA Regional Institute', eventDate: '2026-08-18', venue: 'Gram Panchayat, Dindigul', category: 'EXTENSION', link: `${GRI_BASE_URL}/uba/health_camp_2026` },
+    { id: 'e3', title: 'Special Lecture on Nai Talim & Modern Rural Education', organizer: 'Dept of Gandhian Thought', eventDate: '2026-08-14', venue: 'Dr. G. Ramachandran Seminar Hall', category: 'WORKSHOP', link: `${GRI_BASE_URL}/events/gandhian_lecture` },
+  ],
+
+  tenders: [
+    { tenderNo: 'GRI/EST/2026/T-12', title: 'Supply & Installation of 100kW Solar Rooftop Power Plant', closingDate: '2026-08-30', status: 'ACTIVE', category: 'WORKS', documentUrl: `${GRI_BASE_URL}/tenders/solar_100kw.pdf` },
+    { tenderNo: 'GRI/PUR/2026/T-11', title: 'Procurement of HPC Workstations for Computer Centre', closingDate: '2026-08-22', status: 'ACTIVE', category: 'EQUIPMENT', documentUrl: `${GRI_BASE_URL}/tenders/hpc.pdf` },
+    { tenderNo: 'GRI/SEC/2026/T-10', title: 'AMC for Campus Security & Housekeeping Services', closingDate: '2026-08-15', status: 'ACTIVE', category: 'SERVICES', documentUrl: `${GRI_BASE_URL}/tenders/security.pdf` },
+  ],
+
+  careers: [
+    { advtNo: 'GRI/REC/2026/02', postName: 'Junior Research Fellow (JRF) - DST Quantum Project', department: 'Dept of Physics', salary: '₹31,000 + HRA/mo', qualification: 'M.Sc. Physics with CSIR-NET / GATE', lastDate: '2026-08-25', pdfUrl: `${GRI_BASE_URL}/careers/jrf.pdf` },
+    { advtNo: 'GRI/REC/2026/01', postName: 'Guest Faculty in French Language & Literature', department: 'School of English', salary: '₹1,500/lecture', qualification: 'M.A. French with NET/Ph.D.', lastDate: '2026-08-20', pdfUrl: `${GRI_BASE_URL}/careers/french.pdf` },
+    { advtNo: 'GRI/STAFF/2026/03', postName: 'Technical Assistant (Computer Laboratory)', department: 'Computer Centre', salary: 'Pay Level 6', qualification: 'B.E. CSE / B.Tech IT / MCA', lastDate: '2026-08-28', pdfUrl: `${GRI_BASE_URL}/careers/tech.pdf` },
+  ],
+
+  studentCorner: {
+    portals: [
+      { name: 'Samarth@GRI Student ERP', url: 'https://ruraluniv.samarth.ac.in', badge: 'Official ERP' },
+      { name: 'GRI Student Portal', url: 'https://portal.ruraluniv.ac.in', badge: 'CIA & Grades' },
+      { name: 'Geo-Fenced Attendance', url: 'https://attendance.ruraluniv.ac.in', badge: 'BLE + GPS' },
+      { name: 'Library OPAC Catalog', url: `${GRI_BASE_URL}/facilities/library`, badge: 'Digital Library' },
+    ],
+    academic_services: [
+      { title: 'ESE Time Table Lookup Tool', url: `${GRI_BASE_URL}/examtt` },
+      { title: 'Official Transcript Application PDF', url: `${GRI_BASE_URL}/includes/exam/Application_Transcript.pdf` },
+      { title: 'Duplicate Degree Certificate Application', url: `${GRI_BASE_URL}/includes/exam/DuplicateCertificate.pdf` },
+      { title: 'e-SANAD Degree Verification Portal', url: 'https://portal.ruraluniv.ac.in/esanad' },
+    ],
+    welfare_grievances: [
+      { title: 'Anti-Ragging Online Affidavit', url: `${GRI_BASE_URL}/antiragging` },
+      { title: 'UGC e-Samadhan Grievance Portal', url: 'https://e-samadhan.ugc.ac.in' },
+      { title: 'Internal Complaints Committee (ICC)', url: `${GRI_BASE_URL}/icc` },
+      { title: 'Equal Opportunity & Reservation Cell', url: `${GRI_BASE_URL}/eoc` },
+    ],
+  },
 };
+

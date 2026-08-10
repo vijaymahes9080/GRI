@@ -1,10 +1,10 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Home, BookOpen, Layers, Compass, Bot, User } from 'lucide-react-native';
+import { Home, Compass, Layers, Bell, User } from 'lucide-react-native';
 import { useAppConfig } from '../../core/config/useAppConfig';
 
 export default function TabsLayout() {
-  const { theme, isFeatureEnabled } = useAppConfig();
+  const { theme } = useAppConfig();
 
   return (
     <Tabs
@@ -33,11 +33,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="academics"
+        name="discover"
         options={{
-          title: 'Academics',
-          href: isFeatureEnabled('departments') ? undefined : null,
-          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
+          title: 'Explore',
+          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -48,17 +47,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="discover"
+        name="alerts"
         options={{
-          title: 'Discover',
-          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="ai_chat"
-        options={{
-          title: 'AI Assistant',
-          tabBarIcon: ({ color, size }) => <Bot size={size} color={color} />,
+          title: 'Alerts',
+          tabBarIcon: ({ color, size }) => <Bell size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -66,6 +58,18 @@ export default function TabsLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="academics"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="ai_chat"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -89,3 +93,4 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
