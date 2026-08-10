@@ -49,14 +49,17 @@ apiClient.interceptors.response.use(
 
       if (refreshToken) {
         try {
-          const refreshResponse = await axios.post<ApiResponse<{ accessToken: string }>>(
+          const refreshResponse = await axios.post<{ access_token: string; refresh_token: string }>(
             `${API_BASE_URL}/auth/refresh`,
             { refreshToken }
           );
 
-          if (refreshResponse.data.success && refreshResponse.data.data.accessToken) {
-            const newAccessToken = refreshResponse.data.data.accessToken;
+          if (refreshResponse.data.access_token) {
+            const newAccessToken = refreshResponse.data.access_token;
             storage.set(storageKeys.ACCESS_TOKEN, newAccessToken);
+            if (refreshResponse.data.refresh_token) {
+              storage.set(storageKeys.REFRESH_TOKEN, refreshResponse.data.refresh_token);
+            }
 
             if (originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

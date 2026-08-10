@@ -7,19 +7,34 @@ import math
 from typing import List, Dict, Any
 
 class PredictionEngine:
-    def predict_attendance_risk(self, attendance_percentage: float, total_classes_left: int) -> Dict[str, Any]:
-        """Predicts risk of falling below 75% attendance threshold accurately."""
-        attendance_percentage = max(0.0, min(100.0, attendance_percentage))
-        total_classes_left = max(0, total_classes_left)
+    def predict_attendance_risk(
+        self,
+        attendance_percentage: float,
+        total_classes_left: int,
+        classes_held: int | None = None,
+    ) -> Dict[str, Any]:
+        """Predicts risk of falling below the 75% attendance threshold.
 
-        # Estimate total semester classes (default 60 minimum or based on remaining)
-        total_semester_classes = max(60, 45 + total_classes_left)
-        classes_held = max(1, total_semester_classes - total_classes_left)
+        When the number of classes already held is known it is used directly
+        (total = held + remaining). When it is unknown a documented default
+        semester length of 60 classes is assumed so the estimate is stable and
+        does not double-count the remaining classes.
+        """
+        attendance_percentage = max(0.0, min(100.0, attendance_percentage))
+        total_classes_left = max(0, int(total_classes_left))
+
+        if classes_held is None:
+            total_semester_classes = 60
+            classes_held = max(0, total_semester_classes - total_classes_left)
+        else:
+            classes_held = max(0, int(classes_held))
+            total_semester_classes = classes_held + total_classes_left
+
         classes_attended = (attendance_percentage / 100.0) * classes_held
-        
+
         required_total_attended = 0.75 * total_semester_classes
         classes_needed = max(0, math.ceil(required_total_attended - classes_attended))
-        
+
         is_achievable = classes_needed <= total_classes_left
         is_at_risk = attendance_percentage < 75.0 or not is_achievable
 
@@ -56,13 +71,20 @@ class PredictionEngine:
         required_sgpa = (required_total_points - current_total_points) / remaining_semesters
         
         is_achievable = 0.0 <= required_sgpa <= 10.0
+
+        if required_sgpa <= 0.0:
+            message = "Target CGPA already met or exceeded with current performance."
+        elif is_achievable:
+            message = "Target achievable with consistent academic performance!"
+        else:
+            message = "Target SGPA is mathematically unachievable."
         
         return {
             "current_cgpa": current_cgpa,
             "target_cgpa": target_cgpa,
             "required_sgpa_per_remaining_semester": round(min(10.0, max(0.0, required_sgpa)), 2),
             "is_achievable": is_achievable,
-            "message": "Target achievable with consistent academic performance!" if is_achievable else "Target SGPA is mathematically unachievable."
+            "message": message,
         }
 
     def recommend_courses(self, department: str, semester: int) -> List[Dict[str, Any]]:

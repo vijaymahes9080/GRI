@@ -1,7 +1,8 @@
+import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter()
 
@@ -42,7 +43,7 @@ async def get_outpass_list():
 
 @router.post("/outpass", response_model=dict)
 async def create_outpass(payload: OutPassCreate):
-    new_id = f"OPT-8841-03"
+    new_id = f"OPT-{int(time.time() * 1000)}"
     return {
         "success": True,
         "statusCode": 201,
@@ -50,6 +51,6 @@ async def create_outpass(payload: OutPassCreate):
         "data": {
             "id": new_id,
             "status": "PENDING_PARENT",
-            "createdAt": datetime.utcnow().isoformat()
+            "createdAt": datetime.now(timezone.utc).isoformat()
         }
     }

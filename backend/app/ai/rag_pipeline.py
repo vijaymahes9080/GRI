@@ -31,12 +31,20 @@ Provide a clear, accurate response followed by explicit source document citation
 """
 
 def sanitize_rag_prompt(text: str) -> str:
-    """Sanitize prompt inputs against prompt injection and override vectors."""
+    """Sanitize prompt inputs against prompt injection and override vectors.
+
+    Strips prompt boundary tokens, fencing, and role-override markers, then
+    filters known instruction-hijacking phrases. Everything outside the plain
+    question is neutralized so the user's text is always treated as data.
+    """
     if not text:
         return ""
-    # Strip prompt boundary attempt tokens and system instruction overrides
-    sanitized = re.sub(r"(<<<|>>>|```|system:|assistant:|user:)", "", text, flags=re.IGNORECASE)
-    sanitized = re.sub(r"(ignore previous instructions|disregard|system prompt)", "[filtered]", sanitized, flags=re.IGNORECASE)
+
+    sanitized = re.sub(r"(\[\[\[|\]\]\]|<<<|>>>|```|system:|assistant:|user:)",
+                       " ", text, flags=re.IGNORECASE)
+    sanitized = re.sub(r"(ignore previous instructions|disregard (all |the |)previous|system prompt|reveal (your|the) prompt|you are now)",
+                       "[filtered]", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"\s+", " ", sanitized)
     return sanitized.strip()
 
 class RAGPipelineEngine:

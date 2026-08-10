@@ -10,6 +10,7 @@ router = APIRouter()
 class AttendancePredictRequest(BaseModel):
     currentAttendance: float
     totalClassesLeft: int = 15
+    classesHeld: Optional[int] = None
 
 class CgpaTargetRequest(BaseModel):
     currentCgpa: float
@@ -19,7 +20,11 @@ class CgpaTargetRequest(BaseModel):
 
 @router.post("/predict/attendance", response_model=dict)
 async def predict_attendance(req: AttendancePredictRequest):
-    result = prediction_engine.predict_attendance_risk(req.currentAttendance, req.totalClassesLeft)
+    result = prediction_engine.predict_attendance_risk(
+        req.currentAttendance,
+        req.totalClassesLeft,
+        classes_held=req.classesHeld,
+    )
     return {
         "success": True,
         "statusCode": 200,

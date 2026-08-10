@@ -30,27 +30,31 @@ export const LoginScreen: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     try {
-      // Production API call simulation / authentication handshake
-      setTimeout(() => {
-        setAuth(
-          {
-            id: 'usr_88419921',
-            username: data.username,
-            email: `${data.username}@ruraluniv.ac.in`,
-            fullName: 'Vijay Maheswari',
-            role: 'STUDENT',
-            department: 'Computer Science & Applications',
-            rollNumber: 'GRI-2024-8841',
-          },
-          'jwt_access_token_demo_8841',
-          'jwt_refresh_token_demo_8841'
-        );
-        setLoading(false);
-        router.replace('/(tabs)/home');
-      }, 1000);
+      const { apiClient } = await import('../../../core/api');
+      const email = data.username.includes('@') ? data.username.toLowerCase() : `${data.username.toLowerCase()}@ruraluniv.ac.in`;
+      const response = await apiClient.post('/auth/login', {
+        email,
+        password: data.password,
+      });
+
+      const { access_token, refresh_token, role } = response.data;
+      setAuth(
+        {
+          id: `usr_${email.split('@')[0]}`,
+          username: data.username,
+          email,
+          fullName: email.split('@')[0],
+          role: (role || 'STUDENT').toUpperCase() as any,
+          department: 'Computer Science & Applications',
+        },
+        access_token,
+        refresh_token
+      );
+      router.replace('/(tabs)/home');
     } catch (err: any) {
+      Alert.alert('Login Failed', err?.response?.data?.detail || err?.message || 'Invalid email or password');
+    } finally {
       setLoading(false);
-      Alert.alert('Login Failed', err?.message || 'Invalid username or password');
     }
   };
 

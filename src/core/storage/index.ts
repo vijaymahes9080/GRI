@@ -1,8 +1,23 @@
 import { MMKV } from 'react-native-mmkv';
+import Constants from 'expo-constants';
+
+// The MMKV encryption key must be injected per-build via
+// EXPO_PUBLIC_MMKV_ENCRYPTION_KEY or app.json extra.mmkvEncryptionKey.
+// No shared hardcoded secret ships in the bundle. In development a key derived
+// from the install ID is used so the store stays encrypted locally; production
+// builds without a configured key fall back to unencrypted MMKV — sensitive
+// tokens should additionally be placed in secure storage (expo-secure-store).
+const configuredKey: string | undefined =
+  (Constants.expoConfig?.extra?.mmkvEncryptionKey as string | undefined) ||
+  process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY;
+
+const encryptionKey: string | undefined = __DEV__
+  ? configuredKey || Constants.installationId
+  : configuredKey;
 
 export const storage = new MMKV({
   id: 'gri-app-storage',
-  encryptionKey: 'gri-android-secure-key-v1',
+  ...(encryptionKey ? { encryptionKey } : {}),
 });
 
 export const storageKeys = {

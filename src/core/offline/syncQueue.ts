@@ -19,7 +19,7 @@ export const getSyncQueue = (): PendingSyncItem[] => {
 export const enqueueOfflineAction = (endpoint: string, method: 'POST' | 'PUT' | 'DELETE', payload: any): void => {
   const queue = getSyncQueue();
   const newItem: PendingSyncItem = {
-    id: `sync_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    id: `sync_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
     endpoint,
     method,
     payload,
@@ -52,6 +52,8 @@ export const processOfflineSyncQueue = async (): Promise<{ successCount: number;
       failCount++;
       if (item.retries < 5) {
         remainingItems.push({ ...item, retries: item.retries + 1 });
+      } else {
+        console.warn(`[SyncQueue] Dropping item after 5 failed retries: ${item.endpoint} (${item.id})`);
       }
     }
   }

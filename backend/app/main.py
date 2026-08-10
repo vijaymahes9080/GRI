@@ -19,6 +19,7 @@ from backend.app.api.v1.endpoints import (
     statutory,
     extension_cells,
     public,
+    contracts,
 )
 
 app = FastAPI(
@@ -35,11 +36,11 @@ from backend.app.core.security_middleware import SecurityHeadersMiddleware, Rate
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimiterWAFMiddleware, max_requests=100, window_seconds=60)
 
-# CORS Middleware
+# CORS Middleware — origins come from validated settings (never "*" with credentials)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=settings.CORS_ORIGINS or ["http://localhost:8081"],
+    allow_credentials=bool(settings.CORS_ORIGINS and "*" not in settings.CORS_ORIGINS),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -66,6 +67,7 @@ app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["F
 app.include_router(statutory.router, prefix=f"{settings.API_V1_STR}/statutory", tags=["Statutory Bodies & Regulations"])
 app.include_router(extension_cells.router, prefix=f"{settings.API_V1_STR}/extension", tags=["Extension, Outreach & Cells"])
 app.include_router(public.router, prefix=f"{settings.API_V1_STR}/public", tags=["Public Portal & Research Integrations"])
+app.include_router(contracts.router, prefix=f"{settings.API_V1_STR}", tags=["Mobile App Contracts"])
 app.include_router(websockets.router, prefix="", tags=["Real-time WebSockets"])
 
 @app.get("/health", tags=["Health"])
