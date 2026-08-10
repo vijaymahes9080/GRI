@@ -18,6 +18,7 @@ from backend.app.api.v1.endpoints import (
     website_sync,
     statutory,
     extension_cells,
+    public,
 )
 
 app = FastAPI(
@@ -64,6 +65,7 @@ app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", ta
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
 app.include_router(statutory.router, prefix=f"{settings.API_V1_STR}/statutory", tags=["Statutory Bodies & Regulations"])
 app.include_router(extension_cells.router, prefix=f"{settings.API_V1_STR}/extension", tags=["Extension, Outreach & Cells"])
+app.include_router(public.router, prefix=f"{settings.API_V1_STR}/public", tags=["Public Portal & Research Integrations"])
 app.include_router(websockets.router, prefix="", tags=["Real-time WebSockets"])
 
 @app.get("/health", tags=["Health"])
