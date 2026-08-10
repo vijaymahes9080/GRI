@@ -44,7 +44,7 @@ class UniversityWebsiteSyncService:
             }
         ]
 
-    async def fetch_department_directory(()) -> List[Dict[str, Any]]:
+    async def fetch_department_directory(self) -> List[Dict[str, Any]]:
         """Fetches complete department and faculty listings."""
         return [
             {"code": "CS", "name": "Department of Computer Science & Applications", "head": "Dr. R. Ramanathan", "email": "cs@ruraluniv.ac.in"},

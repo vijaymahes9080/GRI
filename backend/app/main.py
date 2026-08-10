@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from backend.app.core.config import settings
 from backend.app.api.v1.endpoints import (
@@ -42,8 +41,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Prometheus Monitoring Instrumentation
-Instrumentator().instrument(app).expose(app)
+try:
+    from prometheus_fastapi_instrumentator import Instrumentator
+    Instrumentator().instrument(app).expose(app)
+except ImportError:
+    pass
 
 # Include Routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])

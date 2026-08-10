@@ -42,6 +42,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+import json
+from starlette.responses import JSONResponse
+
 class RateLimiterWAFMiddleware(BaseHTTPMiddleware):
     """Sliding Window Rate Limiter (Max 100 requests / minute per IP)."""
 
@@ -55,7 +58,14 @@ class RateLimiterWAFMiddleware(BaseHTTPMiddleware):
         client_ip = request.client.host if request.client else "unknown"
         current_time = time.time()
 
-        # Clean old timestamps
+        # Clean old timestamps and prevent dictionary memory growth
+        if len(self.ip_history) > 10000:
+            # Purge stale keys if tracking memory expands
+            self.ip_history = {
+                ip: timestamps for ip, timestamps in self.ip_history.items()
+                if any(current_time - t < self.window_seconds for t in timestamps)
+            }
+
         if client_ip in self.ip_history:
             self.ip_history[client_ip] = [
                 t for t in self.ip_history[client_ip] if current_time - t < self.window_seconds
@@ -65,9 +75,9 @@ class RateLimiterWAFMiddleware(BaseHTTPMiddleware):
 
         if len(self.ip_history[client_ip]) >= self.max_requests:
             security_logger.warning(f"[WAF RATE LIMIT EXCEEDED] IP: {client_ip} | Path: {request.url.path}")
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Rate limit exceeded. Maximum 100 requests per minute allowed.",
+                content={"detail": "Rate limit exceeded. Maximum 100 requests per minute allowed."},
             )
 
         self.ip_history[client_ip].append(current_time)
