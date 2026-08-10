@@ -10,6 +10,7 @@ Verifies that the audit fixes hold:
   6. WAF rate limiter returns 429 after the request budget is exhausted.
 """
 
+import os
 import pytest
 from fastapi.testclient import TestClient
 
@@ -229,6 +230,11 @@ def test_library_search_contract():
 # WAF rate limiting
 # ---------------------------------------------------------------------------
 def test_rate_limiter_returns_429():
-    responses = [client.get("/api/v1/app/config") for _ in range(105)]
-    statuses = [r.status_code for r in responses]
-    assert 429 in statuses
+    os.environ["TESTING"] = "false"
+    try:
+        responses = [client.get("/api/v1/app/config") for _ in range(105)]
+        statuses = [r.status_code for r in responses]
+        assert 429 in statuses
+    finally:
+        os.environ["TESTING"] = "true"
+

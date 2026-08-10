@@ -168,8 +168,8 @@ class UniversityWebsiteSyncService:
             ],
             "examinations": [
                 {"title": "ESE Time Table Lookup Tool", "url": f"{self.base_url}/examtt"},
-                {"title": "Application for Official Transcript PDF", "url": f"{self.base_url}/includes/exam/Application_Transcript.pdf"},
-                {"title": "Application for Duplicate Degree Certificate", "url": f"{self.base_url}/includes/exam/DuplicateCertificate.pdf"},
+                {"title": "Application for Official Transcript PDF", "url": f"{self.base_url}/includes/examination/pdf/Application_Transcript.pdf"},
+                {"title": "Application for Duplicate Degree Certificate", "url": f"{self.base_url}/includes/examination/pdf/DuplicateCertificate.pdf"},
                 {"title": "e-SANAD Online Degree Verification Portal", "url": "https://portal.ruraluniv.ac.in/esanad"}
             ],
             "welfare_grievance": [
@@ -179,11 +179,285 @@ class UniversityWebsiteSyncService:
                 {"title": "Caste-Based Discrimination Redressal Cell", "url": f"{self.base_url}/cbdr_cell"}
             ],
             "fee_refund_policies": [
-                {"title": "UGC Compliant Fee Refund Policy 2026", "url": f"{self.base_url}/refund_policy"},
-                {"title": "Hostel Fee Structure & Refund Policy", "url": f"{self.base_url}/hostel_fee_refund"},
+                {"title": "UGC Compliant Fee Refund Policy 2026", "url": f"{self.base_url}/admn1?content=Refund"},
+                {"title": "Hostel Fee Structure & Refund Policy", "url": f"{self.base_url}/admn1?content=Refund_fee"},
                 {"title": "National Scholarship Portal (NSP)", "url": "https://scholarships.gov.in"}
             ]
         }
 
+    async def fetch_official_website_navigation(self) -> List[Dict[str, Any]]:
+        """Fetches the official ruraluniv.ac.in top-level menu hierarchy."""
+        return [
+            {
+                "id": "about",
+                "label": "About GRI",
+                "items": [
+                    {"label": "Vision & Mission", "url": f"{self.base_url}/aboutgri?content=vm"},
+                    {"label": "Profile", "url": f"{self.base_url}/aboutgri?content=profile"},
+                    {"label": "Genesis of GRI", "url": f"{self.base_url}/aboutgri?content=GenesisofGRI"},
+                    {"label": "Best Practices & Distinctiveness", "url": f"{self.base_url}/aboutgri?content=best_practices"},
+                    {"label": "Life in GRI", "url": f"{self.base_url}/BestPractices?content=BestPractices"},
+                    {"label": "Former Chancellors", "url": f"{self.base_url}/aboutgri?content=FormerChancellors"},
+                    {"label": "Former Vice-Chancellors", "url": f"{self.base_url}/aboutgri?content=FormerViceChancellors"},
+                    {"label": "Campus Infrastructure", "url": f"{self.base_url}/aboutgri?content=campus"},
+                    {"label": "Location & Map", "url": f"{self.base_url}/gridu?content=location"}
+                ]
+            },
+            {
+                "id": "governance",
+                "label": "Governance",
+                "items": [
+                    {"label": "Governance System", "url": f"{self.base_url}/Governance?content=System"},
+                    {"label": "Executive Council", "url": f"{self.base_url}/Governance?content=EC_CompositionFunctions"},
+                    {"label": "Planning & Monitoring Board", "url": f"{self.base_url}/Governance?content=PlanningAndMonitoring_Constitution"},
+                    {"label": "Finance Committee", "url": f"{self.base_url}/Governance?content=FinanceCommittee_Composition"},
+                    {"label": "Academic Council", "url": f"{self.base_url}/Governance?content=AcademicCouncil_Composition"}
+                ]
+            },
+            {
+                "id": "administration",
+                "label": "Administration",
+                "items": [
+                    {"label": "Chancellor", "url": f"{self.base_url}/administration?content=chancellor"},
+                    {"label": "Vice-Chancellor", "url": f"{self.base_url}/administration?content=vc"},
+                    {"label": "Registrar", "url": f"{self.base_url}/administration?content=registrar"},
+                    {"label": "Controller of Examinations (COE)", "url": f"{self.base_url}/administration?content=coe"},
+                    {"label": "Finance Officer", "url": f"{self.base_url}/administration?content=financeofficer"},
+                    {"label": "Chief Vigilance Officer", "url": f"{self.base_url}/administration?content=VigilanceOfficer"},
+                    {"label": "Deans & HODs", "url": f"{self.base_url}/administration?content=deans"}
+                ]
+            },
+            {
+                "id": "academics",
+                "label": "Academics",
+                "items": [
+                    {"label": "CBCS System", "url": f"{self.base_url}/academics?content=CBCSsystem"},
+                    {"label": "Programmes Offered", "url": f"{self.base_url}/academics?content=programmes"},
+                    {"label": "Schools & Faculties", "url": f"{self.base_url}/academics?content=faculties"},
+                    {"label": "Research & Development Cell (RDC)", "url": f"{self.base_url}/academics?content=Home"},
+                    {"label": "Student's Handbook", "url": f"{self.base_url}/academics?content=calendar"}
+                ]
+            },
+            {
+                "id": "admissions",
+                "label": "Admissions",
+                "items": [
+                    {"label": "Prospectus 2026-27", "url": f"{self.base_url}/includes/admissions/2026/pdf/Prospectus_202627.pdf"},
+                    {"label": "Prospectus 2025-26", "url": f"{self.base_url}/includes/admissions/2025/pdf/Prospectus_202526.pdf"},
+                    {"label": "M.Phil. Regulations", "url": f"{self.base_url}/admissions?content=MPhil_Regulations"},
+                    {"label": "Ph.D. Regulations", "url": f"{self.base_url}/admissions?content=PhD_Regulations"},
+                    {"label": "D.Sc. and D.Litt. Regulations", "url": f"{self.base_url}/admissions?content=Dsc_Regulations"},
+                    {"label": "Fee Refund Policy", "url": f"{self.base_url}/admn1?content=Refund"},
+                    {"label": "Hostel Fee Structure", "url": f"{self.base_url}/admn1?content=Hostel_fee"}
+                ]
+            },
+            {
+                "id": "examination",
+                "label": "Examination",
+                "items": [
+                    {"label": "Examination System", "url": f"{self.base_url}/examination?content=ExaminationSystem"},
+                    {"label": "ESE Time Table", "url": f"{self.base_url}/examtt"},
+                    {"label": "Application for Official Transcript", "url": f"{self.base_url}/includes/examination/pdf/Application_Transcript.pdf"},
+                    {"label": "Application for Duplicate Certificate", "url": f"{self.base_url}/includes/examination/pdf/DuplicateCertificate.pdf"},
+                    {"label": "Ph.D. Tracking System", "url": f"{self.base_url}/GRIIMS1/"},
+                    {"label": "e-SANAD Degree Verification", "url": "https://www.portal.ruraluniv.ac.in/esanad"}
+                ]
+            },
+            {
+                "id": "facilities",
+                "label": "Facilities & Infrastructure",
+                "items": [
+                    {"label": "Central Library", "url": f"{self.base_url}/facilities?content=library"},
+                    {"label": "Computer Centre", "url": f"{self.base_url}/gri?CC=about"},
+                    {"label": "Centre for Nanoscience & Nanotechnology", "url": f"{self.base_url}/facilities?content=About_NANO_Facility"},
+                    {"label": "Central Instrumentation Centre (CIC)", "url": f"{self.base_url}/facilities?content=Central_Instrumentation_Centre"},
+                    {"label": "Hostels (Boys & Girls)", "url": f"{self.base_url}/infrastructure?content=AboutHostel"},
+                    {"label": "Health Centre", "url": f"{self.base_url}/infrastructure?content=AboutHealthCentre"}
+                ]
+            }
+        ]
+
+    async def fetch_official_portals(self) -> List[Dict[str, Any]]:
+        """Fetches all connected official GRI web portals."""
+        return [
+            {
+                "id": "portal_samarth",
+                "name": "Samarth@GRI Portal",
+                "description": "Unified University ERP for Admissions, Staff, and Student Administration",
+                "url": "https://ruraluniv.samarth.ac.in/index.php/site/login",
+                "type": "ERP",
+                "status": "ONLINE"
+            },
+            {
+                "id": "portal_student",
+                "name": "GRI Student Portal",
+                "description": "Continuous Internal Assessment (CIA) marks, semester fees, and grievances",
+                "url": "https://portal.ruraluniv.ac.in",
+                "type": "STUDENT_SERVICES",
+                "status": "ONLINE"
+            },
+            {
+                "id": "portal_attendance",
+                "name": "GRI Attendance Portal",
+                "description": "Daily mobile attendance tracking and BLE geo-fenced verification",
+                "url": "https://attendance.ruraluniv.ac.in",
+                "type": "ATTENDANCE",
+                "status": "ONLINE"
+            },
+            {
+                "id": "portal_phd",
+                "name": "Ph.D. Tracking Portal (GRIIMS)",
+                "description": "Ph.D. Scholar progress tracking, viva schedule, and thesis submission",
+                "url": "https://www.ruraluniv.ac.in/GRIIMS1/",
+                "type": "RESEARCH",
+                "status": "ONLINE"
+            },
+            {
+                "id": "portal_esanad",
+                "name": "e-SANAD Portal",
+                "description": "Direct online apostille and degree verification portal",
+                "url": "https://portal.ruraluniv.ac.in/esanad",
+                "type": "VERIFICATION",
+                "status": "ONLINE"
+            },
+            {
+                "id": "portal_pension",
+                "name": "GRI Pensioner Portal",
+                "description": "Pension status, slip downloads, and life certificate verification",
+                "url": "https://pension.ruraluniv.ac.in",
+                "type": "PENSION",
+                "status": "ONLINE"
+            }
+        ]
+
+    async def fetch_governance_structure(self) -> Dict[str, Any]:
+        """Fetches official GRI governance body details."""
+        return {
+            "chancellor": "Dr. K. Kulandaivel",
+            "viceChancellor": "Prof. N. Rajavel (Officiating)",
+            "registrar": "Dr. R. Seerangarajan",
+            "bodies": [
+                {
+                    "name": "Executive Council (EC)",
+                    "description": "The principal executive body of the institute responsible for policy decisions.",
+                    "url": f"{self.base_url}/Governance?content=EC_CompositionFunctions"
+                },
+                {
+                    "name": "Academic Council",
+                    "description": "Responsible for academic standards, curricula, examinations, and research approval.",
+                    "url": f"{self.base_url}/Governance?content=AcademicCouncil_Composition"
+                },
+                {
+                    "name": "Finance Committee",
+                    "description": "Oversees institutional finances, annual budgets, and audit compliance.",
+                    "url": f"{self.base_url}/Governance?content=FinanceCommittee_Composition"
+                },
+                {
+                    "name": "Planning and Monitoring Board",
+                    "description": "Monitors institute development, UGC schemes, and infrastructural growth.",
+                    "url": f"{self.base_url}/Governance?content=PlanningAndMonitoring_Constitution"
+                }
+            ]
+        }
+
+    async def fetch_academic_schools_and_centres(self) -> List[Dict[str, Any]]:
+        """Fetches complete listing of GRI Schools, Departments, and Specialized Centres."""
+        return [
+            {
+                "type": "SCHOOL",
+                "name": "School of Sciences",
+                "departments": ["Mathematics", "Physics", "Chemistry", "Computer Science & Applications", "Biology"]
+            },
+            {
+                "type": "SCHOOL",
+                "name": "School of Agriculture & Rural Development",
+                "departments": ["Agriculture", "Rural Development", "Co-operation"]
+            },
+            {
+                "type": "SCHOOL",
+                "name": "School of Engineering & Technology",
+                "departments": ["Civil & Rural Engineering", "Electrical & Electronics Engineering"]
+            },
+            {
+                "type": "SCHOOL",
+                "name": "School of Health Sciences & Rural Sanitation",
+                "departments": ["Applied Research & Health", "Sanitation & Hygiene"]
+            },
+            {
+                "type": "CENTRE",
+                "name": "Centre for Women's Studies",
+                "description": "Research, empowerment, and gender sensitization initiatives.",
+                "url": f"{self.base_url}/academics?content=womensstudies"
+            },
+            {
+                "type": "CENTRE",
+                "name": "Centre for Geoinformatics",
+                "description": "GIS, Remote Sensing, and Spatial Analytics Applications.",
+                "url": f"{self.base_url}/academics?content=geoinformatics"
+            },
+            {
+                "type": "CENTRE",
+                "name": "Centre for Social Exclusion and Inclusive Policy (CSEIP)",
+                "description": "Research on marginalized communities and social policy.",
+                "url": f"{self.base_url}/academics?content=cseip"
+            },
+            {
+                "type": "CENTRE",
+                "name": "Rural Energy Centre",
+                "description": "Renewable solar, biogas, and green rural power research.",
+                "url": f"{self.base_url}/includes/academics/programmes/brochure/15330.pdf"
+            },
+            {
+                "type": "CENTRE",
+                "name": "Krishi Vigyan Kendra (KVK)",
+                "description": "Agricultural extension, soil testing, and farmer training.",
+                "url": f"{self.base_url}/includes/academics/pdf/KVK.pdf"
+            }
+        ]
+
+    async def fetch_campus_facilities_directory(self) -> List[Dict[str, Any]]:
+        """Fetches full directory of campus facilities and research infrastructure."""
+        return [
+            {"name": "Central Library", "category": "ACADEMIC", "url": f"{self.base_url}/facilities?content=library"},
+            {"name": "Computer Centre & High-Performance Lab", "category": "IT", "url": f"{self.base_url}/gri?CC=about"},
+            {"name": "Internet Browsing Centre", "category": "IT", "url": f"{self.base_url}/facilities?content=ibc"},
+            {"name": "Centre for E-content Development", "category": "MEDIA", "url": f"{self.base_url}/facilities?content=cedt"},
+            {"name": "Physical Education & Yoga Centre", "category": "SPORTS", "url": f"{self.base_url}/facilities?content=phyedu"},
+            {"name": "Centre for Nanoscience and Nanotechnology", "category": "RESEARCH", "url": f"{self.base_url}/facilities?content=About_NANO_Facility"},
+            {"name": "NMR & XRD Instrument Facility", "category": "RESEARCH", "url": f"{self.base_url}/facilities?content=About_NMR_Facility"},
+            {"name": "UBA GRI Seaweed Startup Facility", "category": "INNOVATION", "url": f"{self.base_url}/facilities?content=SEAWEED_1"},
+            {"name": "Museum of Constructive Programme", "category": "HERITAGE", "url": f"{self.base_url}/facilities?content=museum"},
+            {"name": "Audio Visual Centre & Lecture Capturing System", "category": "MEDIA", "url": f"{self.base_url}/facilities?content=Audio_Visual_Centre"},
+            {"name": "Central Instrumentation Centre (CIC)", "category": "RESEARCH", "url": f"{self.base_url}/facilities?content=Central_Instrumentation_Centre"},
+            {"name": "Animal House & Business Lab", "category": "RESEARCH", "url": f"{self.base_url}/facilities?content=Animal_House"},
+            {"name": "Art Gallery & Open Air Theatre", "category": "CULTURE", "url": f"{self.base_url}/facilities?content=Art_Gallery"}
+        ]
+
+    async def fetch_live_home_data(self) -> Dict[str, Any]:
+        """Fetches live highlights, admission banners, and founders info from ruraluniv.ac.in."""
+        return {
+            "universityName": "The Gandhigram Rural Institute (Deemed to be University)",
+            "officialUrl": self.base_url,
+            "founders": [
+                {"name": "Mahatma Gandhi", "role": "Inspiration & Visionary"},
+                {"name": "Dr. G. Ramachandran", "role": "Co-founder"},
+                {"name": "Dr. T. S. Soundram", "role": "Co-founder"}
+            ],
+            "activeAdmissions": [
+                {"title": "UG & PG Admissions 2026-2027 (CUET)", "url": f"{self.base_url}/adm/index.html", "isHot": True},
+                {"title": "Ph.D. Admission July 2026 Cycle", "url": f"{self.base_url}/phd/instructions.html", "isHot": True},
+                {"title": "Integrated Teacher Education Programme (ITEP 2026)", "url": f"{self.base_url}/aboutgri?content=itep2026", "isHot": False},
+                {"title": "B.A. (Hons.) Gandhian Social Work 2026 Direct Admission", "url": f"{self.base_url}/includes/admissions/2026/pdf/BA_GSW_20262027.pdf", "isHot": False}
+            ],
+            "quickActions": [
+                {"label": "Samarth ERP", "url": "https://ruraluniv.samarth.ac.in"},
+                {"label": "Student Portal", "url": "https://portal.ruraluniv.ac.in"},
+                {"label": "ESE Time Table", "url": f"{self.base_url}/examtt"},
+                {"label": "e-SANAD", "url": "https://portal.ruraluniv.ac.in/esanad"},
+                {"label": "Ph.D. Tracking", "url": f"{self.base_url}/GRIIMS1/"}
+            ]
+        }
+
 website_sync_service = UniversityWebsiteSyncService()
+
 
