@@ -34,8 +34,8 @@ project.ext.react = [
 ]
 
 react {
-    root = file("../")
-    entryFile = new File(projectRoot, "node_modules/expo-router/entry.js")
+    root = file("../../")
+    entryFile = file("../../node_modules/expo-router/entry.js")
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, new File(projectRoot)).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, new File(projectRoot)).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
     codegenDir = new File(["node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, new File(projectRoot)).text.trim()).getParentFile().getAbsoluteFile()
@@ -54,10 +54,10 @@ react {
     // codegenDir = file("../node_modules/@react-native/codegen")
 
     /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
-    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
-    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
+    // The list of variants to that are debuggable. For those we're going to
+    // skip the bundling of the JS bundle and the assets. By default is just 'debug'.
+    // Setting to [] ensures JS bundle is built into the APK for standalone execution on device.
+    debuggableVariants = []
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.

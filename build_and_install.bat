@@ -28,7 +28,7 @@ adb reverse tcp:8081 tcp:8081
 
 echo.
 echo [4/4] Installing 16KB-aligned APK onto connected phone...
-adb install -r "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
+adb install --user 0 -r -g "%~dp0android\app\build\outputs\apk\debug\app-debug-16kb.apk"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
