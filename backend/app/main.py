@@ -16,6 +16,8 @@ from backend.app.api.v1.endpoints import (
     ai_analytics,
     websockets,
     website_sync,
+    statutory,
+    extension_cells,
 )
 
 app = FastAPI(
@@ -60,6 +62,8 @@ app.include_router(website_sync.router, prefix=f"{settings.API_V1_STR}/website",
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
+app.include_router(statutory.router, prefix=f"{settings.API_V1_STR}/statutory", tags=["Statutory Bodies & Regulations"])
+app.include_router(extension_cells.router, prefix=f"{settings.API_V1_STR}/extension", tags=["Extension, Outreach & Cells"])
 app.include_router(websockets.router, prefix="", tags=["Real-time WebSockets"])
 
 @app.get("/health", tags=["Health"])

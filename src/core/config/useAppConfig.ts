@@ -11,6 +11,7 @@ export const DEFAULT_APP_CONFIG: AppServerConfig = {
   maintenanceMessage: 'GRI Services are undergoing scheduled maintenance. Please check back shortly.',
   features: {
     admissions: true,
+    admissions_2026: true,
     examinations: true,
     results: true,
     departments: true,
@@ -24,6 +25,11 @@ export const DEFAULT_APP_CONFIG: AppServerConfig = {
     placement: true,
     hostel: true,
     transport: true,
+    uba_extension: true,
+    kvk_advisories: true,
+    statutory_governance: true,
+    research_rdc: true,
+    flagship_schemes: true,
   },
   navigation: [
     { id: 'home', title: 'Home', icon: 'home', route: '/(tabs)/home', order: 1, enabled: true },

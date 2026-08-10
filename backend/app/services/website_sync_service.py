@@ -45,11 +45,23 @@ class UniversityWebsiteSyncService:
         ]
 
     async def fetch_department_directory(self) -> List[Dict[str, Any]]:
-        """Fetches complete department and faculty listings."""
+        """Fetches complete department and faculty listings across GRI Schools."""
         return [
-            {"code": "CS", "name": "Department of Computer Science & Applications", "head": "Dr. R. Ramanathan", "email": "cs@ruraluniv.ac.in"},
-            {"code": "AG", "name": "School of Agriculture & Rural Development", "head": "Dr. M. Sundaram", "email": "agri@ruraluniv.ac.in"},
-            {"code": "ENG", "name": "Department of Civil & Rural Engineering", "head": "Dr. K. Ganesan", "email": "civil@ruraluniv.ac.in"},
+            {"code": "CS", "school": "School of Sciences", "name": "Department of Computer Science & Applications", "head": "Dr. R. Ramanathan", "email": "cs@ruraluniv.ac.in"},
+            {"code": "AG", "school": "School of Agriculture & Rural Development", "name": "Department of Agriculture", "head": "Dr. M. Sundaram", "email": "agri@ruraluniv.ac.in"},
+            {"code": "ENG", "school": "School of Engineering & Technology", "name": "Department of Civil & Rural Engineering", "head": "Dr. K. Ganesan", "email": "civil@ruraluniv.ac.in"},
+            {"code": "TAM", "school": "School of Tamil, Indian Languages & Fine Arts", "name": "Department of Tamil", "head": "Dr. P. Murugesan", "email": "tamil@ruraluniv.ac.in"},
+            {"code": "HSC", "school": "School of Health Sciences & Rural Sanitation", "name": "Department of Applied Research & Health", "head": "Dr. S. Meenakshi", "email": "health@ruraluniv.ac.in"},
+            {"code": "MGT", "school": "School of Management Studies", "name": "Department of Rural Management", "head": "Dr. N. Kannan", "email": "management@ruraluniv.ac.in"},
+        ]
+
+    async def fetch_statutory_notices(self) -> List[Dict[str, Any]]:
+        """Fetches mandatory disclosures, anti-ragging undertakings, and statutory rules."""
+        return [
+            {"title": "Deemed to be University Regulations 2023", "category": "REGULATION", "link": f"{self.base_url}/regulations2023"},
+            {"title": "Anti-Ragging Undertaking & UGC Advisory", "category": "COMPLIANCE", "link": f"{self.base_url}/antiragging"},
+            {"title": "Code of Conduct for Teaching and Non-Teaching Staff", "category": "ETHICS", "link": f"{self.base_url}/code_of_conduct"},
+            {"title": "Ban on Use of Motorized Vehicles by Campus Students", "category": "CAMPUS_RULE", "link": f"{self.base_url}/vehicle_policy"},
         ]
 
 website_sync_service = UniversityWebsiteSyncService()

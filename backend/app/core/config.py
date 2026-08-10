@@ -6,6 +6,15 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
+    # Institutional Metadata
+    INSTITUTION_NAME: str = "The Gandhigram Rural Institute (Deemed to be University)"
+    MOTTO: str = "கிராமம் உயர நாடு உயரும் (As villages rise, the nation rises)"
+    NAAC_GRADE: str = "A++ (4th Cycle)"
+    MINISTRY: str = "Ministry of Education (Shiksha Mantralaya), Govt. of India"
+    OFFICIAL_WEBSITE: str = "https://ruraluniv.ac.in"
+    PORTAL_URL: str = "https://www.ruraluniv.ac.in/Portal/index.html"
+    SAMARTH_URL: str = "https://ruraluniv.samarth.ac.in"
+
     # Free Cloud Stack Integrations
     RAILWAY_ENVIRONMENT: str = os.getenv("RAILWAY_ENVIRONMENT", "production")
     SUPABASE_DB_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:supa_pass@db.xyz.supabase.co:5432/postgres")
