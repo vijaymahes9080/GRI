@@ -60,6 +60,8 @@ export default function DedicatedNavigationDirectoryScreen() {
         { name: 'Organisational Structure', route: '/about/organisational' },
         { name: 'Important Documents & MoA', route: '/about/documents' },
         { name: 'Annual Reports & Audits', route: '/about/annual_reports' },
+        { name: 'Mandatory Disclosures & NAAC', route: '/about/naac' },
+        { name: 'NIRF Ranking Report', route: '/about/nirf' },
       ],
     },
     {
@@ -69,10 +71,12 @@ export default function DedicatedNavigationDirectoryScreen() {
       color: '#911C03',
       items: [
         { name: 'Governance System Overview', route: '/governance/system' },
+        { name: 'GRI Society', route: '/governance/society' },
         { name: 'Board of Management (BoM)', route: '/governance/bom' },
-        { name: 'Academic Council', route: '/governance/index' },
-        { name: 'Finance Committee', route: '/governance/index' },
-        { name: 'Planning & Monitoring Board', route: '/governance/index' },
+        { name: 'Academic Council', route: '/governance/academic_council' },
+        { name: 'Finance Committee', route: '/governance/finance_committee' },
+        { name: 'Planning & Monitoring Board', route: '/governance/planning_board' },
+        { name: 'Governance Documents & Gazette', route: '/governance/documents' },
       ],
     },
     {
@@ -84,9 +88,12 @@ export default function DedicatedNavigationDirectoryScreen() {
         { name: 'Chancellor', route: '/administration/chancellor' },
         { name: 'Vice-Chancellor', route: '/administration/vc' },
         { name: 'Registrar', route: '/administration/registrar' },
-        { name: 'Controller of Examinations (CoE)', route: '/administration/index' },
-        { name: 'Finance Officer', route: '/administration/index' },
-        { name: 'Deans of 7 Schools', route: '/administration/index' },
+        { name: 'Controller of Examinations (CoE)', route: '/administration/coe' },
+        { name: 'Finance Officer', route: '/administration/finance_officer' },
+        { name: 'Chief Vigilance Officer (CVO)', route: '/administration/cvo' },
+        { name: 'Deans of 7 Schools', route: '/administration/deans' },
+        { name: 'Heads of Departments (HoDs)', route: '/administration/hods' },
+        { name: 'Administrative Offices Directory', route: '/administration/offices' },
       ],
     },
     {
@@ -95,11 +102,12 @@ export default function DedicatedNavigationDirectoryScreen() {
       icon: BookOpen,
       color: '#F16236',
       items: [
-        { name: '7 Major Schools Directory', route: '/academics/index' },
+        { name: '7 Major Schools Directory', route: '/academics/schools' },
+        { name: 'Academic Programmes (UG/PG/Ph.D.)', route: '/academics/programmes' },
         { name: 'Department of Computer Science & Apps', route: '/academics/department_detail?deptId=cs' },
         { name: 'Department of Agriculture', route: '/academics/department_detail?deptId=agri' },
-        { name: 'Choice Based Credit System (CBCS)', route: '/academics/index' },
-        { name: 'Student Handbook & Calendar', route: '/academics/index' },
+        { name: 'Choice Based Credit System (CBCS)', route: '/academics/cbcs' },
+        { name: 'Student Handbook & Calendar', route: '/academics/calendar' },
       ],
     },
     {
@@ -108,9 +116,9 @@ export default function DedicatedNavigationDirectoryScreen() {
       icon: GraduationCap,
       color: '#6A1B9A',
       items: [
-        { name: 'Admissions Prospectus 2026-27', route: '/admissions/index' },
-        { name: 'Fee Refund Policy', route: '/admissions/index' },
-        { name: 'Hostel Fees & Rules', route: '/admissions/index' },
+        { name: 'Admissions Prospectus 2026-27', route: '/admissions/prospectus' },
+        { name: 'Fee Structure & Refund Policy', route: '/admissions/fees' },
+        { name: 'UG & PG Admission Guidelines', route: '/admissions/ug' },
       ],
     },
     {
@@ -120,28 +128,39 @@ export default function DedicatedNavigationDirectoryScreen() {
       color: '#00838F',
       items: [
         { name: 'ESE Examination Timetable Query', route: '/examination/timetable' },
-        { name: 'Official Academic Transcripts', route: '/examination/index' },
+        { name: 'Official Academic Transcripts', route: '/examination/transcripts' },
         { name: 'Ph.D. Online Status Tracking', route: '/examination/phd_tracking' },
         { name: 'e-SANAD Document Verification', route: '/examination/esanad' },
       ],
     },
     {
       id: 'facilities',
-      title: 'Campus Facilities',
+      title: 'Campus Facilities & Labs',
       icon: MapPin,
       color: '#33691E',
       items: [
+        { name: 'Facilities Overview', route: '/facilities' },
         { name: 'Central Library & OPAC', route: '/facilities/library' },
         { name: 'Computer Centre & NKN Network', route: '/facilities/computer_centre' },
       ],
     },
     {
       id: 'infrastructure',
-      title: 'Infrastructure',
+      title: 'Infrastructure & Hostels',
       icon: Building,
       color: '#C2185B',
       items: [
+        { name: 'Infrastructure Overview', route: '/infrastructure' },
         { name: 'Boys & Girls Hostels', route: '/infrastructure/hostels' },
+      ],
+    },
+    {
+      id: 'research',
+      title: 'Research & Development Cell',
+      icon: Award,
+      color: '#6A1B9A',
+      items: [
+        { name: 'RDC Overview & Policy', route: '/research' },
       ],
     },
     {
@@ -150,7 +169,7 @@ export default function DedicatedNavigationDirectoryScreen() {
       icon: Archive,
       color: '#E65100',
       items: [
-        { name: 'Latest News & Bulletins', route: '/enews/index' },
+        { name: 'Latest News & Bulletins', route: '/enews' },
       ],
     },
     {
@@ -159,7 +178,19 @@ export default function DedicatedNavigationDirectoryScreen() {
       icon: Award,
       color: '#E65100',
       items: [
-        { name: 'Alumni Network & RaiseGRI', route: '/alumni/index' },
+        { name: 'Alumni Network Overview', route: '/alumni' },
+        { name: 'Alumni Registration & RaiseGRI', route: '/alumni/registration' },
+      ],
+    },
+    {
+      id: 'public_vault',
+      title: 'Downloads & Campus Contact',
+      icon: Download,
+      color: '#518214',
+      items: [
+        { name: 'Downloads Vault (Circulars & Forms)', route: '/downloads' },
+        { name: 'Contact GRI & Campus Info', route: '/contact' },
+        { name: 'Forgot Password & Credentials', route: '/auth/forgot_password' },
       ],
     },
   ];

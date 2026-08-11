@@ -10,9 +10,9 @@ export default function GlobalSearchScreen() {
   const searchResults = [
     { title: 'Department of Computer Science & Applications', category: 'Academics', route: '/academics/department_detail?deptId=cs', icon: BookOpen, color: '#518214' },
     { title: 'Department of Agriculture', category: 'Academics', route: '/academics/department_detail?deptId=agri', icon: BookOpen, color: '#518214' },
-    { title: 'Board of Management (Executive Council)', category: 'Governance', route: '/governance/index', icon: Shield, color: '#911C03' },
-    { title: 'Controller of Examinations (CoE)', category: 'Administration', route: '/administration/index', icon: Users, color: '#0D47A1' },
-    { title: 'Admissions Prospectus 2026-2027', category: 'Admissions', route: '/admissions/index', icon: GraduationCap, color: '#6A1B9A' },
+    { title: 'Board of Management (Executive Council)', category: 'Governance', route: '/governance', icon: Shield, color: '#911C03' },
+    { title: 'Controller of Examinations (CoE)', category: 'Administration', route: '/administration', icon: Users, color: '#0D47A1' },
+    { title: 'Admissions Prospectus 2026-2027', category: 'Admissions', route: '/admissions', icon: GraduationCap, color: '#6A1B9A' },
     { title: 'ESE Examination Timetable Query', category: 'Examinations', route: '/examination/timetable', icon: FileText, color: '#00838F' },
     { title: 'Online Ph.D. Status Tracking', category: 'Examinations', route: '/examination/phd_tracking', icon: FileText, color: '#00838F' },
     { title: 'e-SANAD Document Verification', category: 'Services', route: '/examination/esanad', icon: FileText, color: '#2E7D32' },

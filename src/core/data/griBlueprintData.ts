@@ -42,7 +42,7 @@ export const GRI_BANNER_ANNOUNCEMENTS = [
     tag: 'Admissions',
     date: 'Aug 10, 2026',
     description: 'Applications invited for UG, PG, Ph.D., Diploma & B.Voc. programmes at GRI.',
-    route: '/admissions/index',
+    route: '/admissions',
     color: '#F16236',
   },
   {
@@ -60,7 +60,7 @@ export const GRI_BANNER_ANNOUNCEMENTS = [
     tag: 'Quality Assurance',
     date: 'Jul 25, 2026',
     description: 'Gandhigram Rural Institute re-accredited with A Grade by NAAC.',
-    route: '/about/reports',
+    route: '/about/annual_reports',
     color: '#518214',
   },
   {
@@ -77,10 +77,10 @@ export const GRI_BANNER_ANNOUNCEMENTS = [
 export const GRI_QUICK_ACTIONS = [
   { id: 'samarth', title: 'Student Portal', icon: 'UserCheck', route: '/auth/student_login', color: '#0D47A1' },
   { id: 'exam', title: 'ESE Timetable', icon: 'Calendar', route: '/examination/timetable', color: '#00838F' },
-  { id: 'prospectus', title: 'Prospectus 2026', icon: 'FileText', route: '/admissions/prospectus', color: '#F16236' },
+  { id: 'prospectus', title: 'Prospectus 2026', icon: 'FileText', route: '/admissions', color: '#F16236' },
   { id: 'phd', title: 'Ph.D. Tracker', icon: 'Award', route: '/examination/phd_tracking', color: '#6A1B9A' },
   { id: 'esanad', title: 'e-SANAD Verification', icon: 'CheckCircle', route: '/examination/esanad', color: '#2E7D32' },
-  { id: 'alumni', title: 'Alumni Network', icon: 'Users', route: '/alumni/index', color: '#E65100' },
+  { id: 'alumni', title: 'Alumni Network', icon: 'Users', route: '/alumni', color: '#E65100' },
 ];
 
 export const GRI_SCHOOLS: SchoolData[] = [
