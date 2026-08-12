@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { storage, storageKeys, getItem, setItem, removeItem } from '../storage';
+import { apiClient } from '../api';
 
 export type UserRole =
   | 'STUDENT'
@@ -38,7 +39,7 @@ interface AuthState {
 
   // Actions
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUser: (partialUser: Partial<User>) => void;
 }
 
@@ -65,7 +66,16 @@ export const useAuthStore = create<AuthState>((set) => {
       });
     },
 
-    logout: () => {
+    logout: async () => {
+      const refreshToken = storage.getString(storageKeys.REFRESH_TOKEN);
+      if (refreshToken) {
+        try {
+          await apiClient.post('/auth/logout', { refresh_token: refreshToken });
+        } catch (e) {
+          console.warn('[AuthStore] Backend logout request notification:', e);
+        }
+      }
+
       removeItem(storageKeys.ACCESS_TOKEN);
       removeItem(storageKeys.REFRESH_TOKEN);
       removeItem(storageKeys.USER_DATA);
@@ -88,3 +98,4 @@ export const useAuthStore = create<AuthState>((set) => {
     },
   };
 });
+

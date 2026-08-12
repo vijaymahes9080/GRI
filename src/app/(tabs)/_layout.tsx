@@ -1,10 +1,19 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Tabs, useRouter } from 'expo-router';
 import { Home, Compass, Layers, Bell, User } from 'lucide-react-native';
 import { useAppConfig } from '../../core/config/useAppConfig';
+import { useAuthStore } from '../../core/auth/authStore';
 
 export default function TabsLayout() {
+  const router = useRouter();
   const { theme } = useAppConfig();
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/auth/login');
+    }
+  }, [isAuthenticated]);
 
   return (
     <Tabs

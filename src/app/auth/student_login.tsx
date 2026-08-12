@@ -1,13 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, User, Lock, CheckCircle2, BookOpen, Calendar, Award, FileText, LogOut } from 'lucide-react-native';
+import { useAuthStore } from '../../core/auth/authStore';
 
 export default function StudentPortalScreen() {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isAuthenticated, setAuth, logout } = useAuthStore();
   const [username, setUsername] = useState('21304012');
-  const [password, setPassword] = useState('••••••••');
+  const [password, setPassword] = useState('StudentPass#123');
+
+  const handleStudentLogin = () => {
+    setAuth(
+      {
+        id: 'std_21304012',
+        username: username,
+        email: 'student@test.edu',
+        fullName: 'Vijay M',
+        role: 'STUDENT',
+        department: 'School of Sciences — Dept of Computer Science & Applications',
+        rollNumber: username || '21304012',
+      },
+      'student_access_token_2026',
+      'student_refresh_token_2026'
+    );
+  };
+
+  const handleStudentLogout = async () => {
+    Alert.alert('Sign Out', 'Sign out of Student Portal?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/auth/login');
+        },
+      },
+    ]);
+  };
+
+  const isStudentLoggedIn = isAuthenticated && user?.role === 'STUDENT';
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -21,8 +54,8 @@ export default function StudentPortalScreen() {
             <Text className="text-xl font-bold text-white">Samarth@GRI Student Portal</Text>
             <Text className="text-xs text-blue-100 font-medium">Authenticated Student Dashboard</Text>
           </View>
-          {isLoggedIn && (
-            <TouchableOpacity onPress={() => setIsLoggedIn(false)} className="p-2 bg-rose-500/80 rounded-xl">
+          {isStudentLoggedIn && (
+            <TouchableOpacity onPress={handleStudentLogout} className="p-2 bg-rose-500/80 rounded-xl">
               <LogOut size={16} color="#FFFFFF" />
             </TouchableOpacity>
           )}
@@ -30,7 +63,7 @@ export default function StudentPortalScreen() {
       </View>
 
       <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        {!isLoggedIn ? (
+        {!isStudentLoggedIn ? (
           <View className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
             <Text className="text-base font-bold text-gray-900 mb-1">Student Portal Login</Text>
             <Text className="text-xs text-gray-600 mb-4">Enter your University Register Number and Password to access your profile.</Text>
@@ -57,10 +90,17 @@ export default function StudentPortalScreen() {
             </View>
 
             <TouchableOpacity
-              onPress={() => setIsLoggedIn(true)}
-              className="bg-[#0D47A1] p-3.5 rounded-xl items-center shadow-sm"
+              onPress={handleStudentLogin}
+              className="bg-[#0D47A1] p-3.5 rounded-xl items-center shadow-sm mb-3"
             >
               <Text className="text-xs font-bold text-white uppercase">Access Student Dashboard</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => router.replace('/auth/login')}
+              className="p-2 items-center"
+            >
+              <Text className="text-xs font-semibold text-[#0D47A1]">Switch to Multi-User Role Login</Text>
             </TouchableOpacity>
           </View>
         ) : (

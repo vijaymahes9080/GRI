@@ -1,10 +1,20 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GraduationCap, ArrowRight } from 'lucide-react-native';
+import { GraduationCap, ArrowRight, LogIn } from 'lucide-react-native';
+import { useAuthStore } from '../core/auth/authStore';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { isAuthenticated, user } = useAuthStore();
+
+  const handleEnter = () => {
+    if (isAuthenticated && user) {
+      router.replace('/(tabs)/home');
+    } else {
+      router.replace('/auth/login');
+    }
+  };
 
   return (
     <View className="flex-1 bg-khadi-blue items-center justify-center p-6">
@@ -15,17 +25,31 @@ export default function WelcomeScreen() {
         Gandhigram Rural Institute
       </Text>
       <Text className="text-base text-khadi-light text-center mb-10">
-        Deemed to be University · Enterprise Mobile Platform
+        Deemed to be University · Multi-User Enterprise Platform
       </Text>
 
       <TouchableOpacity
-        onPress={() => router.replace('/(tabs)/home')}
-        className="flex-row items-center bg-saffron px-8 py-4 rounded-xl shadow-lg"
+        onPress={handleEnter}
+        className="flex-row items-center bg-saffron px-8 py-4 rounded-xl shadow-lg mb-4"
         activeOpacity={0.8}
       >
-        <Text className="text-white font-semibold text-lg mr-2">Enter Portal</Text>
+        <Text className="text-white font-semibold text-lg mr-2">
+          {isAuthenticated ? `Continue as ${user?.fullName?.split(' ')[0] || 'User'}` : 'Enter Portal'}
+        </Text>
         <ArrowRight size={20} color="#FFFFFF" />
       </TouchableOpacity>
+
+      {!isAuthenticated && (
+        <TouchableOpacity
+          onPress={() => router.replace('/auth/login')}
+          className="flex-row items-center bg-white/15 px-6 py-3 rounded-xl border border-white/20"
+          activeOpacity={0.8}
+        >
+          <LogIn size={18} color="#FFFFFF" className="mr-2" />
+          <Text className="text-white font-medium text-base ml-2">Sign In to Multi-User Account</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
+
