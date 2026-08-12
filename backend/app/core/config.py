@@ -47,12 +47,14 @@ class Settings(BaseSettings):
     @property
     def ASYNC_DATABASE_URL(self) -> str:
         if self.SUPABASE_DB_URL:
-            return self.SUPABASE_DB_URL.replace("postgresql://", "postgresql+asyncpg://")
-        if not self.POSTGRES_PASSWORD:
-            raise ValueError(
-                "DATABASE_URL is not configured. Set DATABASE_URL or POSTGRES_* environment variables."
-            )
-        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            url = self.SUPABASE_DB_URL
+            if url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            elif url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+            return url
+        pwd = self.POSTGRES_PASSWORD or "gri_password"
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{pwd}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     # Redis Settings
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")

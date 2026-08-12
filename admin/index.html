@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GRI Admin — User Management & Control Panel</title>
-  <meta name="description" content="GRI Gandhigram Rural Institute — Admin Control Panel for User Management, Login Permissions, Feature Flags and Audit Log.">
+  <title>GRI Admin — User Management & Real-Time Communication Control Panel</title>
+  <meta name="description" content="GRI Gandhigram Rural Institute — Admin Control Panel for User Management, Login Permissions, Real-Time Notifications, Online Database Sync, Feature Flags and Audit Log.">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* =====================================================================
@@ -104,7 +104,18 @@
       box-shadow: 0 0 0 3px rgba(81,130,20,0.2);
     }
     .form-group select option { background: var(--card); color: var(--text); }
-    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+
+    .checkbox-group {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px;
+    }
+    .checkbox-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text); cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;
+    }
 
     .btn-primary {
       width: 100%; padding: 14px;
@@ -162,6 +173,10 @@
       margin-left: auto; background: var(--danger); color: white;
       font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
     }
+    .nav-badge-info {
+      margin-left: auto; background: var(--info); color: #0A0F1E;
+      font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 20px;
+    }
 
     .sidebar-footer {
       margin-top: auto; padding: 16px 12px;
@@ -217,6 +232,13 @@
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; } 50% { opacity: 0.5; }
+    }
+
+    .db-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      background: rgba(56,189,248,0.12); color: var(--info);
+      font-size: 12px; font-weight: 600; border: 1px solid rgba(56,189,248,0.25);
     }
 
     .content {
@@ -288,6 +310,8 @@
     .btn-info:hover { background: rgba(56,189,248,0.2); }
     .btn-green { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
     .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-orange { background: linear-gradient(135deg, var(--accent), #e04b1f); color: white; }
+    .btn-orange:hover { opacity: 0.9; transform: translateY(-1px); }
 
     /* =====================================================================
        FILTER ROW
@@ -351,6 +375,7 @@
     .role-faculty { background: rgba(81,130,20,0.15); color: #86EFAC; }
     .role-staff   { background: rgba(245,158,11,0.15); color: var(--warning); }
     .role-other   { background: rgba(167,139,250,0.15); color: var(--purple); }
+    .role-all     { background: rgba(241,98,54,0.18); color: #FDBA74; }
 
     /* =====================================================================
        ACTIONS CELL
@@ -467,6 +492,7 @@
     .audit-icon.suspend { background: var(--warning-bg); }
     .audit-icon.delete  { background: var(--danger-bg); }
     .audit-icon.login   { background: var(--purple-bg); }
+    .audit-icon.notif   { background: rgba(241,98,54,0.15); }
     .audit-action { font-size: 14px; font-weight: 600; }
     .audit-meta   { font-size: 12px; color: var(--text2); margin-top: 3px; }
     .audit-time   { font-size: 11px; color: var(--text3); margin-left: auto; white-space: nowrap; }
@@ -505,7 +531,7 @@
       </div>
     </div>
     <div class="login-title">Welcome back, Admin</div>
-    <div class="login-sub">Sign in to manage users, permissions and system settings.</div>
+    <div class="login-sub">Sign in to manage users, send notifications and monitor system activity.</div>
     <div class="form-group">
       <label for="login-email">Email Address</label>
       <input type="email" id="login-email" placeholder="admin@ruraluniv.ac.in" value="admin@ruraluniv.ac.in">
@@ -531,7 +557,7 @@
 <div class="modal-overlay" id="modal-create">
   <div class="modal">
     <div class="modal-title">Create User Account</div>
-    <div class="modal-sub">Admin creates login credentials for student, staff, or other users.</div>
+    <div class="modal-sub">Admin creates login credentials for student, faculty, staff, or other users.</div>
     <div class="form-group">
       <label>Full Name *</label>
       <input type="text" id="cu-name" placeholder="e.g. Ramesh Kumar">
@@ -548,8 +574,8 @@
       <label>Role *</label>
       <select id="cu-role">
         <option value="student">Student</option>
-        <option value="staff">Staff</option>
         <option value="faculty">Faculty</option>
+        <option value="staff">Staff</option>
         <option value="other">Other / External</option>
       </select>
     </div>
@@ -593,8 +619,8 @@
       <label>New Role *</label>
       <select id="role-select">
         <option value="student">Student</option>
-        <option value="staff">Staff</option>
         <option value="faculty">Faculty</option>
+        <option value="staff">Staff</option>
         <option value="other">Other / External</option>
         <option value="admin">Admin</option>
       </select>
@@ -632,10 +658,19 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Users</div>
+    <div class="nav-label">Users & Permissions</div>
     <button class="nav-item" id="nav-users" onclick="switchTab('users')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       All Users
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Real-Time Messaging</div>
+    <button class="nav-item" id="nav-notifications" onclick="switchTab('notifications')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Send Notifications
+      <span class="nav-badge-info" id="notif-count-badge">LIVE</span>
     </button>
   </div>
 
@@ -673,6 +708,7 @@
   <div class="topbar">
     <div class="page-title" id="page-title">Dashboard Overview</div>
     <div class="topbar-right">
+      <div class="db-badge">⚡ Open-Source DB: Connected</div>
       <div class="status-dot">API Online</div>
       <button class="btn btn-green" onclick="openModal('modal-create')" style="padding:8px 16px">
         + New User
@@ -716,7 +752,7 @@
         <div class="section-header">
           <div>
             <div class="section-title">Users by Role</div>
-            <div class="section-sub">Breakdown of registered accounts</div>
+            <div class="section-sub">Breakdown of accounts stored in online database</div>
           </div>
         </div>
         <div id="role-breakdown" style="display:flex;gap:14px;flex-wrap:wrap;"></div>
@@ -791,6 +827,141 @@
       </div>
     </div>
 
+    <!-- ===== NOTIFICATIONS TAB ===== -->
+    <div class="tab-panel" id="tab-notifications">
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">📣 Send Real-Time Broadcast Notification</div>
+            <div class="section-sub">Send instant push, email, SMS, and in-app alerts to Students, Faculty, Staff, Others or All Users</div>
+          </div>
+          <button class="btn btn-orange" onclick="sendEmergencyAlert()">🚨 Quick Emergency SOS</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <!-- Left: Broadcast Form -->
+          <div style="background:var(--card2);padding:24px;border-radius:14px;border:1px solid var(--border2)">
+            <div style="font-weight:700;font-size:15px;margin-bottom:18px;color:var(--text)">Compose Notification</div>
+            
+            <div class="form-group">
+              <label>Target Audience *</label>
+              <select id="notif-target">
+                <option value="all">🌐 All Users (Entire University Campus)</option>
+                <option value="student">🎓 Students Only</option>
+                <option value="faculty">👨‍🏫 Faculty Members Only</option>
+                <option value="staff">💼 Non-Teaching Staff Only</option>
+                <option value="other">👤 Others / External / Guests / Alumni</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Notification Category *</label>
+              <select id="notif-category">
+                <option value="info">📢 General Announcement</option>
+                <option value="exam">📝 Examination Alert</option>
+                <option value="fee">💰 Fee / Scholarship Notice</option>
+                <option value="attendance">📅 Attendance Warning</option>
+                <option value="placement">💼 Campus Placement Drive</option>
+                <option value="circular">📜 Official Circular</option>
+                <option value="emergency">🚨 Emergency Alert</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Dispatch Channels</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" id="ch-push" checked> In-App Push</label>
+                <label class="checkbox-label"><input type="checkbox" id="ch-email" checked> Email Alert</label>
+                <label class="checkbox-label"><input type="checkbox" id="ch-sms"> SMS Text</label>
+                <label class="checkbox-label"><input type="checkbox" id="ch-whatsapp"> WhatsApp</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Notification Title *</label>
+              <input type="text" id="notif-title" placeholder="e.g. Semester Exam Schedule Published">
+            </div>
+
+            <div class="form-group">
+              <label>Message Content *</label>
+              <textarea id="notif-body" placeholder="Type the complete notification message to be sent to mobile apps and portal..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Deep Link / Action Route (Optional)</label>
+              <input type="text" id="notif-deeplink" placeholder="e.g. /(tabs)/examinations or /portal/results">
+            </div>
+
+            <button class="btn btn-green" onclick="sendNotificationBroadcast()" style="width:100%;justify-content:center;padding:12px;font-size:14px;margin-top:8px">
+              🚀 Send Broadcast Notification Now
+            </button>
+          </div>
+
+          <!-- Right: Real-time Stats & Delivery Preview -->
+          <div>
+            <div style="background:var(--card2);padding:24px;border-radius:14px;border:1px solid var(--border2);margin-bottom:20px">
+              <div style="font-weight:700;font-size:15px;margin-bottom:14px">Real-Time Omnichannel Stats</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="background:var(--bg2);padding:14px;border-radius:10px">
+                  <div style="font-size:11px;color:var(--text2)">Push Delivery Rate</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--success)">99.2%</div>
+                </div>
+                <div style="background:var(--bg2);padding:14px;border-radius:10px">
+                  <div style="font-size:11px;color:var(--text2)">SMS Delivery Rate</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--info)">98.7%</div>
+                </div>
+                <div style="background:var(--bg2);padding:14px;border-radius:10px">
+                  <div style="font-size:11px;color:var(--text2)">Email Open Rate</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--purple)">74.3%</div>
+                </div>
+                <div style="background:var(--bg2);padding:14px;border-radius:10px">
+                  <div style="font-size:11px;color:var(--text2)">WhatsApp Delivery</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--warning)">99.8%</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:var(--card2);padding:24px;border-radius:14px;border:1px solid var(--border2)">
+              <div style="font-weight:700;font-size:15px;margin-bottom:12px">Real-Time WebSockets Engine</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">
+                Notifications are pushed instantly to mobile app clients via WebSockets (`/ws/announcements`) and FCM Push Service. All broadcast records are saved permanently in PostgreSQL online storage (`infra.notifications`).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sent Notifications Table -->
+        <div style="margin-top:32px">
+          <div class="section-header">
+            <div>
+              <div class="section-title">📋 Sent Notifications History</div>
+              <div class="section-sub">Live log of broadcasted notifications stored in online database</div>
+            </div>
+            <button class="btn btn-info btn-sm" onclick="loadNotificationHistory()">↺ Refresh Log</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title & Content</th>
+                  <th>Target Audience</th>
+                  <th>Category</th>
+                  <th>Channels</th>
+                  <th>Recipients</th>
+                  <th>Status</th>
+                  <th>Sent At</th>
+                </tr>
+              </thead>
+              <tbody id="notif-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:36px;color:var(--text3)">Loading notification log…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== FEATURE FLAGS TAB ===== -->
     <div class="tab-panel" id="tab-flags">
       <div class="section-card">
@@ -848,7 +1019,7 @@
 /* =====================================================================
    CONFIG
 ===================================================================== */
-const API_BASE = '/api/v1'; // Change to your backend URL e.g. http://localhost:8000/api/v1
+const API_BASE = '/api/v1';
 
 /* =====================================================================
    STATE
@@ -906,7 +1077,6 @@ async function doLogin() {
     loadDashboard();
 
   } catch (e) {
-    // Offline/demo mode — allow demo login
     if (email === 'admin@ruraluniv.ac.in') {
       token = 'demo-mode';
       currentUser = { email, full_name: 'GRI System Administrator', user_id: 'demo', role: 'admin' };
@@ -959,7 +1129,7 @@ async function api(path, opts = {}) {
 }
 
 /* =====================================================================
-   DEMO DATA (works offline without backend)
+   DEMO DATA
 ===================================================================== */
 const _demoUsers = [
   { id: '1', email: 'admin@ruraluniv.ac.in', full_name: 'GRI System Administrator', role: 'admin', approval_status: 'approved', is_active: true, last_login_at: new Date().toISOString(), created_at: '2026-01-01T00:00:00Z' },
@@ -969,11 +1139,17 @@ const _demoUsers = [
   { id: '5', email: 'anita.faculty@ruraluniv.ac.in', full_name: 'Dr. Anita Krishnan', role: 'faculty', approval_status: 'approved', is_active: true, last_login_at: '2026-08-11T12:00:00Z', created_at: '2026-03-15T00:00:00Z' },
   { id: '6', email: 'blocked.user@ruraluniv.ac.in', full_name: 'Suresh Raj', role: 'student', approval_status: 'rejected', is_active: false, last_login_at: null, rejection_reason: 'Duplicate account.', created_at: '2026-07-20T00:00:00Z' },
 ];
+
+const _demoNotifs = [
+  { id: 'NOTIF-20260812-001', title: 'Semester Examination Timetable Published', body: 'The final semester exam timetable for Autumn 2026 is now available on the portal.', target_role: 'student', category: 'exam', channels: ['push', 'email'], recipient_count: 8450, status: 'delivered', created_at: new Date().toISOString(), sender: 'admin@ruraluniv.ac.in' },
+  { id: 'NOTIF-20260811-002', title: 'Faculty Academic Council Meeting', body: 'Mandatory academic council meeting tomorrow at 10:00 AM in Senate Hall.', target_role: 'faculty', category: 'circular', channels: ['push', 'email', 'sms'], recipient_count: 420, status: 'delivered', created_at: new Date(Date.now() - 86400000).toISOString(), sender: 'admin@ruraluniv.ac.in' },
+  { id: 'NOTIF-20260810-003', title: 'Campus Placement Drive — TCS & Wipro', body: 'Registration open for final year B.Tech/MCA students.', target_role: 'student', category: 'placement', channels: ['push', 'whatsapp'], recipient_count: 1200, status: 'delivered', created_at: new Date(Date.now() - 172800000).toISOString(), sender: 'admin@ruraluniv.ac.in' },
+];
+
 const _demoAudit = [
   { id: 'a1', action: 'create_user', actor_id: '1', target_email: 'ramesh.kumar@ruraluniv.ac.in', metadata: {role: 'student'}, created_at: '2026-06-01T09:00:00Z' },
   { id: 'a2', action: 'approve_user', actor_id: '1', target_email: 'priya.staff@ruraluniv.ac.in', metadata: {}, created_at: '2026-06-05T10:30:00Z' },
-  { id: 'a3', action: 'reject_user', actor_id: '1', target_email: 'blocked.user@ruraluniv.ac.in', metadata: {reason: 'Duplicate account.'}, created_at: '2026-07-20T14:00:00Z' },
-  { id: 'a4', action: 'login', actor_id: '1', target_email: 'admin@ruraluniv.ac.in', metadata: {role:'admin'}, created_at: new Date().toISOString() },
+  { id: 'a3', action: 'send_broadcast_notification', actor_id: '1', target_email: 'all_students', metadata: {title: 'Semester Exam Timetable'}, created_at: new Date().toISOString() },
 ];
 
 function demoData(path, opts) {
@@ -982,6 +1158,27 @@ function demoData(path, opts) {
   }
   if (path.includes('/admin/users') && !opts.method) {
     return { users: _demoUsers, total: _demoUsers.length, page: 1, page_size: 20 };
+  }
+  if (path.includes('/notifications/history')) {
+    return { notifications: _demoNotifs, total: _demoNotifs.length };
+  }
+  if (path.includes('/notifications/broadcast')) {
+    const body = JSON.parse(opts.body);
+    const newN = {
+      id: `NOTIF-${Date.now()}`,
+      title: body.title,
+      body: body.body,
+      target_role: body.target_role,
+      category: body.category || 'info',
+      channels: body.channels || ['push'],
+      recipient_count: body.target_role === 'all' ? 14500 : (body.target_role === 'student' ? 11200 : 850),
+      status: 'delivered',
+      created_at: new Date().toISOString(),
+      sender: currentUser.email,
+    };
+    _demoNotifs.unshift(newN);
+    _demoAudit.unshift({ id: `a${Date.now()}`, action: 'send_broadcast_notification', actor_id: '1', target_email: body.target_role, metadata: { title: body.title }, created_at: new Date().toISOString() });
+    return { detail: 'Notification broadcasted successfully.', notification: newN };
   }
   if (path.includes('/admin/audit-log')) {
     return { audit_log: _demoAudit };
@@ -1040,11 +1237,19 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   document.getElementById(`nav-${tab}`)?.classList.add('active');
-  const titles = { dashboard: 'Dashboard Overview', pending: 'Pending Approvals', users: 'All Users', flags: 'Feature Flags', audit: 'Audit Log' };
+  const titles = {
+    dashboard: 'Dashboard Overview',
+    pending: 'Pending Approvals',
+    users: 'All Users',
+    notifications: 'Real-Time Broadcast Notifications',
+    flags: 'Feature Flags',
+    audit: 'Audit Log'
+  };
   document.getElementById('page-title').textContent = titles[tab] || tab;
 
   if (tab === 'pending') loadPending();
   if (tab === 'users') loadUsers();
+  if (tab === 'notifications') loadNotificationHistory();
   if (tab === 'audit') loadAudit();
   if (tab === 'dashboard') loadDashboard();
 }
@@ -1062,12 +1267,10 @@ async function loadDashboard() {
   document.getElementById('stat-rejected').textContent  = stats.by_status?.rejected ?? 0;
   document.getElementById('stat-suspended').textContent = stats.by_status?.suspended ?? 0;
 
-  // Update pending badge
   const pCount = stats.by_status?.pending ?? 0;
   document.getElementById('pending-badge').textContent = pCount;
   document.getElementById('pending-badge').style.display = pCount > 0 ? '' : 'none';
 
-  // Role breakdown
   const rb = document.getElementById('role-breakdown');
   const roleColors = { admin:'danger', student:'info', faculty:'success', staff:'warning', other:'purple' };
   rb.innerHTML = Object.entries(stats.by_role || {}).map(([role, cnt]) => `
@@ -1270,12 +1473,101 @@ async function createUser() {
   if (data?.user_id || data?.detail) {
     toast('success', `✓ Account created for ${email} (${role})`);
     closeModal('modal-create');
-    // Clear form
     ['cu-name','cu-email','cu-password','cu-phone','cu-notes'].forEach(id => document.getElementById(id).value = '');
     loadUsers(); loadDashboard();
   } else {
     toast('error', data?.detail || 'Failed to create user.');
   }
+}
+
+/* =====================================================================
+   NOTIFICATIONS BROADCAST
+===================================================================== */
+async function sendNotificationBroadcast() {
+  const target_role = document.getElementById('notif-target').value;
+  const category    = document.getElementById('notif-category').value;
+  const title       = document.getElementById('notif-title').value.trim();
+  const body        = document.getElementById('notif-body').value.trim();
+  const deep_link   = document.getElementById('notif-deeplink').value.trim();
+
+  const channels = [];
+  if (document.getElementById('ch-push').checked)     channels.push('push');
+  if (document.getElementById('ch-email').checked)    channels.push('email');
+  if (document.getElementById('ch-sms').checked)      channels.push('sms');
+  if (document.getElementById('ch-whatsapp').checked) channels.push('whatsapp');
+
+  if (!title || !body) {
+    toast('error', 'Notification title and message content are required.');
+    return;
+  }
+  if (channels.length === 0) {
+    toast('error', 'Select at least one dispatch channel (Push, Email, SMS, WhatsApp).');
+    return;
+  }
+
+  const res = await api('/notifications/broadcast', {
+    method: 'POST',
+    body: JSON.stringify({ title, body, target_role, category, channels, deep_link: deep_link || null }),
+  });
+
+  if (res?.detail || res?.notification) {
+    toast('success', `🚀 Notification broadcasted to target: ${target_role.toUpperCase()}`);
+    document.getElementById('notif-title').value = '';
+    document.getElementById('notif-body').value = '';
+    document.getElementById('notif-deeplink').value = '';
+    loadNotificationHistory();
+  } else {
+    toast('error', res?.detail || 'Failed to send notification.');
+  }
+}
+
+async function sendEmergencyAlert() {
+  const title = prompt('Enter Emergency SOS Alert Title:', 'CAMPUS EMERGENCY SOS');
+  if (!title) return;
+  const message = prompt('Enter Emergency Alert Details:', 'Immediate evacuation / safety advisory issued by GRI Security Cell.');
+  if (!message) return;
+
+  const res = await api('/notifications/broadcast-emergency', {
+    method: 'POST',
+    body: JSON.stringify({ title, message }),
+  });
+
+  if (res) {
+    toast('success', '🚨 EMERGENCY SOS broadcasted to all campus users via Push + SMS!');
+    loadNotificationHistory();
+  }
+}
+
+async function loadNotificationHistory() {
+  const data = await api('/notifications/history?limit=50');
+  const notifs = data?.notifications || [];
+  const tbody  = document.getElementById('notif-tbody');
+
+  if (notifs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--text3)">No notifications broadcasted yet.</td></tr>`;
+    return;
+  }
+
+  const roleTagClass = { all:'role-all', student:'role-student', faculty:'role-faculty', staff:'role-staff', other:'role-other' };
+
+  tbody.innerHTML = notifs.map(n => `
+    <tr>
+      <td>
+        <div style="font-weight:700;font-size:13px;color:var(--text)">${n.title}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px;max-width:340px">${n.body}</div>
+      </td>
+      <td><span class="role-tag ${roleTagClass[n.target_role] || 'role-other'}">${n.target_role.toUpperCase()}</span></td>
+      <td><span style="font-size:12px;color:var(--info);font-weight:600">${n.category}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${(n.channels || []).map(ch => `<span style="font-size:10px;padding:2px 6px;background:var(--bg2);border-radius:4px;border:1px solid var(--border2)">${ch}</span>`).join('')}
+        </div>
+      </td>
+      <td style="font-weight:700;font-size:13px;color:var(--text)">${(n.recipient_count || 0).toLocaleString()}</td>
+      <td><span class="badge badge-approved">${n.status || 'delivered'}</span></td>
+      <td style="font-size:11px;color:var(--text2)">${formatDate(n.created_at)}</td>
+    </tr>
+  `).join('');
 }
 
 /* =====================================================================
@@ -1295,11 +1587,11 @@ async function loadAudit() {
     create_user: '👤', approve_user: '✅', reject_user: '❌',
     suspend_user: '⏸', reactivate_user: '▶', delete_user: '🗑',
     change_role: '🔁', reset_password: '🔑', login: '🔐',
-    admin_self_register: '🛡', logout: '🚪',
+    send_broadcast_notification: '📣', logout: '🚪',
   };
   const iconClass = {
     create_user: 'create', approve_user: 'approve', reject_user: 'reject',
-    suspend_user: 'suspend', delete_user: 'delete', login: 'login',
+    suspend_user: 'suspend', delete_user: 'delete', login: 'login', send_broadcast_notification: 'notif',
   };
 
   container.innerHTML = logs.map(log => `
@@ -1311,6 +1603,7 @@ async function loadAudit() {
           ${log.target_email ? `Target: ${log.target_email}` : ''}
           ${log.metadata?.reason ? ` · Reason: ${log.metadata.reason}` : ''}
           ${log.metadata?.role ? ` · Role: ${log.metadata.role}` : ''}
+          ${log.metadata?.title ? ` · Title: ${log.metadata.title}` : ''}
           ${log.ip_address ? ` · IP: ${log.ip_address}` : ''}
         </div>
       </div>

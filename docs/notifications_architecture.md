@@ -1,47 +1,58 @@
 # Enterprise Omnichannel Notification Engine Architecture
+
 ## Push (FCM), SMS, Email, WhatsApp Business API & Emergency Broadcast System
-**Author**: Lead Notification Architect (Vijay Mahes)  
-**Version**: 1.0.0  
 
 ---
 
-## 1. System Architecture & Multi-Channel Routing
+## 1. Real-Time Admin Notification Broadcast System
 
-The **GRI Notification Engine** routes institutional messages across 4 distinct channels based on priority and user preference settings:
+The GRI Notification System empowers Administrators to broadcast real-time notifications to targeted university user groups via the **Admin Control Panel** (`/admin/index.html`):
 
 ```mermaid
 flowchart TD
-    Trigger[Trigger Event: Emergency / Exam / Fee / Placement / AI] --> Engine[Notification Router Engine]
+    AdminUI[Admin Control Panel: Send Notification] --> APIEndpoint[POST /api/v1/notifications/broadcast]
     
-    Engine --> PriorityCheck{Priority Matrix?}
+    APIEndpoint --> DBStore[(PostgreSQL: infra.notifications)]
+    APIEndpoint --> WSManager[FastAPI WebSockets: /ws/announcements]
+    APIEndpoint --> MultiChannel[Notification Dispatch Engine]
     
-    PriorityCheck -- High: Emergency SOS --> PushUrgent[FCM High-Priority Push]
-    PriorityCheck -- High: Emergency SOS --> SMSUrgent[Twilio / Msg91 SMS]
-    
-    PriorityCheck -- Medium: Exam / Fees --> PushNormal[FCM Push Notification]
-    PriorityCheck -- Medium: Exam / Fees --> EmailChannel[SMTP / AWS SES Email]
-    PriorityCheck -- Medium: Exam / Fees --> WhatsAppChannel[WhatsApp Business API]
-    
-    PriorityCheck -- Low: AI Recs / Events --> PushSilent[Silent Background Push]
-    
-    PushUrgent --> Analytics[Delivery Analytics & Log]
-    SMSUrgent --> Analytics
-    EmailChannel --> Analytics
-    WhatsAppChannel --> Analytics
+    WSManager --> MobileApp[GRI Mobile App Clients]
+    MultiChannel --> FCMPush[FCM Push Notification]
+    MultiChannel --> Email[SMTP Email]
+    MultiChannel --> SMS[SMS Text]
+    MultiChannel --> WhatsApp[WhatsApp Business]
 ```
 
 ---
 
-## 2. Notification Priority Matrix & Fallback Rules
+## 2. Target Audience Filtering Matrix
 
-| Category | Channels | Priority Queue | Retry Strategy | SLA Delivery |
-|---|---|---|---|---|
-| **Emergency SOS** | Push + SMS | `High (Q1)` | 5 retries (10s interval) | `< 5 seconds` |
-| **Placement Drives** | Push + Email + WhatsApp | `Medium (Q2)` | 3 retries (1m interval) | `< 1 minute` |
-| **Exam & Results** | Push + Email | `Medium (Q2)` | 3 retries (1m interval) | `< 1 minute` |
-| **Attendance Alerts** | Push | `Normal (Q3)` | 2 retries (5m interval) | `< 5 minutes` |
-| **Fee Due Reminders** | Push + Email + SMS | `Normal (Q3)` | 2 retries (5m interval) | `< 5 minutes` |
-| **AI Recommendations** | Push (Silent) | `Low (Q4)` | No retry | Best effort |
+Administrators can route announcements to specific user segments or the entire campus:
+
+| Target Audience | Target Code | Estimated Reach | Typical Use Cases |
+|---|---|---|---|
+| **All Users** | `all` | 14,500+ recipients | Campus Emergency SOS, Holiday Notice, University Convocation |
+| **Students Only** | `student` | 11,200+ students | ESE Exam Timetables, CIA Marks, Attendance Notices, Fee Deadlines |
+| **Faculty Members Only** | `faculty` | 850+ teaching staff | Academic Council Meetings, Valuation Duties, Research Grants |
+| **Non-Teaching Staff Only** | `staff` | 1,450+ staff | Departmental Circulars, Administrative Meetings |
+| **Others / External / Alumni** | `other` | 1,000+ guests | Alumni Reunions, Public Guest Lectures, Open Workshops |
 
 ---
-*End of GRI Notification Engine Architecture Specification.*
+
+## 3. Real-Time Delivery Channels & WebSockets
+
+- **WebSocket Push**: Endpoints connected at `/ws/announcements` receive instant JSON payloads (`type: "NOTIFICATION"` / `type: "EMERGENCY_ALERT"`).
+- **PostgreSQL Database Log**: Every broadcast is recorded with `id`, `title`, `body`, `target_role`, `category`, `channels`, `recipient_count`, `sender`, and `created_at` in table `infra.notifications`.
+- **Admin Audit Trail**: Every notification trigger generates an entry in `core.audit_log`.
+
+---
+
+## 4. Priority Queue & Fallback Rules
+
+| Category | Target Audience | Channels | Priority Queue | SLA Delivery |
+|---|---|---|---|---|
+| **Emergency SOS** | All Users (`all`) | Push + SMS + Email | `High (Q1)` | `< 5 seconds` |
+| **Placement Drives** | Students (`student`) | Push + Email + WhatsApp | `Medium (Q2)` | `< 1 minute` |
+| **Exam & Results** | Students (`student`) | Push + Email | `Medium (Q2)` | `< 1 minute` |
+| **Faculty Meetings** | Faculty (`faculty`) | Push + SMS + Email | `Medium (Q2)` | `< 1 minute` |
+| **Fee Due Reminders** | Students (`student`) | Push + Email + SMS | `Normal (Q3)` | `< 5 minutes` |

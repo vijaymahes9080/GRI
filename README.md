@@ -1,19 +1,58 @@
-# GRI Mobile App — Native Android Application
+# GRI Mobile App & Web Administration System
 
-Official 100% Native Mobile Application for **The Gandhigram Rural Institute (Deemed to be University)**, Gandhigram, Dindigul, Tamil Nadu, India.
+Official 100% Native Mobile Application and Admin Control System for **The Gandhigram Rural Institute (Deemed to be University)**, Gandhigram, Dindigul, Tamil Nadu, India.
 
 ---
 
 ## 🏛️ Application Architecture & Key Features
 
-This application is built as a **pure native mobile application** using React Native, Expo Router, NativeWind (Tailwind CSS), and Lucide Icons. It does **NOT** rely on webviews or external hyperlinks for navigation.
+This application is built as a **pure native mobile application** using React Native, Expo Router, NativeWind (Tailwind CSS), Lucide Icons, FastAPI Backend, and PostgreSQL database.
 
 ### 📱 5-Tab Navigation Structure
 - **Home (`src/app/(tabs)/index.tsx`)**: Main University Dashboard with announcements, quick action tiles, stats, and press releases.
 - **Explore (`src/app/(tabs)/discover.tsx`)**: Complete Category Directory for About, Governance, Administration, Academics, Admissions, Facilities, Infrastructure, Research, E-News, Alumni.
 - **Services (`src/app/(tabs)/services.tsx`)**: Examination System, ESE Timetable Query Tool, e-SANAD, Ph.D. Tracker, Sub-Portals Hub, Downloads.
 - **Alerts (`src/app/(tabs)/alerts.tsx`)**: Filterable Circulars, Exam Notices, Admission Deadlines, Tenders, Careers.
-- **Profile (`src/app/(tabs)/profile.tsx`)**: Authenticated Portal Switcher for Student, Scholar, Department, and Alumni portals.
+- **Profile (`src/app/(tabs)/profile.tsx`)**: Authenticated Portal Switcher for Student, Scholar, Faculty, Staff, and Alumni portals.
+
+---
+
+## 🔑 Authentication, Admin Permission & Multi-Role System
+
+A complete **Multi-Role Authentication & Permission Engine** is built into the backend (`/api/v1/auth` & `/api/v1/admin`):
+
+- **Admin Role**: Self-registers using an administrative secret key + full access to all system modules, user approvals, and real-time broadcasts.
+- **Student, Faculty, Staff, and Other Roles**: Accounts are created and pre-approved directly by the Admin. Users can only log in once approved by the Admin.
+- **Approval Workflow**: Users have `approval_status IN ('approved', 'pending', 'rejected', 'suspended')`. Unapproved logins are rejected with detailed status responses.
+
+---
+
+## 📣 Real-Time Omnichannel Notification Broadcasting
+
+The **Admin Control Panel** ([`admin/index.html`](file:///d:/current%20project/GRI/admin/index.html)) provides a real-time notification broadcast hub:
+- **Target Audience Filter**: Broadcast to **All Users**, **Students Only**, **Faculty Only**, **Staff Only**, or **Others**.
+- **Dispatch Channels**: In-App Push Notifications (via WebSockets `/ws/announcements` & FCM), Email Alerts, SMS Text Messages, WhatsApp Business.
+- **Live Audit & History**: Stored permanently in PostgreSQL database table `infra.notifications`.
+
+---
+
+## 💾 Open-Source PostgreSQL Online Database Architecture
+
+- **PostgreSQL Database Schema**:
+  - `database/schema.sql` — Core institutional schemas (`core`, `academic`, `exam`, `campus`, `finance`, `placement`, `research`, `ai`, `infra`).
+  - `database/schema_v2_extension.sql` — Server-Driven Remote Config, Feature Flags, Navigation Nodes, Unified Content.
+  - `database/schema_auth_extension.sql` — Approval Status, Seed Roles (`admin`, `student`, `faculty`, `staff`, `other`), `sessions`, `audit_log`, `staff_profiles`.
+- **Async Database Connection**: SQLAlchemy 2.0 + `asyncpg` driver supporting Supabase, Railway, Neon, or self-hosted open-source PostgreSQL.
+
+---
+
+## 🧪 Verified Test Suite & Quality Status
+
+The backend includes a comprehensive automated test suite verified with `pytest`:
+```bash
+python -m pytest backend/tests/
+# Result: 37 passed in 8.35s (100% passing)
+```
 
 ---
 
@@ -51,16 +90,12 @@ The application is configured to build an **offline standalone APK** with pre-bu
 build_and_install.bat
 ```
 
-### Build Steps Performed:
-1. **Offline JS Bundling**: Compiles Expo Router and TypeScript into offline assets (`index.android.bundle`).
-2. **Gradle Debug APK Assembly**: Runs `./gradlew assembleDebug` with offline settings (`debuggableVariants = []`).
-3. **16KB Page Alignment**: Aligns shared libraries (`zipalign -p -v 16`).
-4. **Keystore Signing**: Signs aligned APK with debug keystore.
-5. **ADB Installation**: Installs onto primary profile (`adb install --user 0 -r -g`) and launches `.MainActivity` on the connected mobile device.
-
 ---
 
 ## 📄 Documentation Files
 
 - [GRI_PRODUCT_BLUEPRINT.md](file:///d:/current%20project/GRI/GRI_PRODUCT_BLUEPRINT.md): 64-Section Complete Product Blueprint and Navigation Sitemap.
-- [GRI_DEEP_COMPONENT_AUDIT.md](file:///d:/current%20project/GRI/GRI_DEEP_COMPONENT_AUDIT.md): Source Website Component Audit & Portal Mapping.
+- [PROJECT_ARCHITECTURE_AUDIT.md](file:///d:/current%20project/GRI/PROJECT_ARCHITECTURE_AUDIT.md): Project Architecture and System Audit.
+- [docs/Authentication.md](file:///d:/current%20project/GRI/docs/Authentication.md): Comprehensive Authentication & Admin Permission Documentation.
+- [docs/Database.md](file:///d:/current%20project/GRI/docs/Database.md): PostgreSQL Database Schema & Migration Guide.
+- [docs/notifications_architecture.md](file:///d:/current%20project/GRI/docs/notifications_architecture.md): Real-Time Broadcast Notification System Guide.

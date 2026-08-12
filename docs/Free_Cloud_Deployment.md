@@ -47,37 +47,25 @@ This document specifies the zero-cost, high-availability production cloud infras
 
 ## ⚙️ Step-by-Step Setup Guide
 
-### 1. Database & Storage: Supabase Setup
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Execute [database/schema.sql](file:///d:/current%20project/GRI/database/schema.sql) in the Supabase SQL Editor to initialize all 9 database schemas (`core`, `academic`, `exam`, `campus`, `finance`, `placement`, `research`, `ai`, `infra`) and enable `pgvector`.
-3. Copy the Connection String into `.env.production` as `DATABASE_URL`.
+### 1. Database & Storage: Supabase / Online PostgreSQL Setup
+1. Create a free project at [supabase.com](https://supabase.com) or [railway.app](https://railway.app).
+2. Execute the 3 PostgreSQL database schema scripts in order:
+   - `database/schema.sql` (Initializes core schemas `core`, `academic`, `exam`, `campus`, `finance`, `placement`, `research`, `ai`, `infra`).
+   - `database/schema_v2_extension.sql` (Adds `core.app_config`, `core.feature_flags`, `core.navigation_nodes`, `content.entities`).
+   - `database/schema_auth_extension.sql` (Adds `approval_status`, multi-role seeds, `core.sessions`, `core.audit_log`, `core.staff_profiles`).
+3. Copy the PostgreSQL connection URL into your root [`.env`](file:///d:/current%20project/GRI/.env) file:
+   ```env
+   DATABASE_URL="postgresql://postgres:YOUR_SUPABASE_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres"
+   ADMIN_REGISTER_SECRET="GRI_ADMIN_SECRET_2026_CHANGE_ME"
+   ```
 
 ### 2. Backend Microservices: Railway Setup
 1. Link your GitHub repository at [railway.app](https://railway.app).
 2. Configure build strategy to **Dockerfile** using `backend/Dockerfile`.
-3. Set Environment Variables (`DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`).
+3. Set Environment Variables (`DATABASE_URL`, `REDIS_HOST`, `SECRET_KEY`, `ADMIN_REGISTER_SECRET`).
 4. Railway will automatically build and expose `https://api.ruraluniv-app.railway.app`.
 
-### 3. Push Notifications: Firebase Cloud Messaging (FCM)
-1. Register `com.gri.mobile` in the Firebase Console.
-2. Download `google-services.json` and place in `android/app/`.
-3. Generate Server Key for push notification dispatch via FastAPI `notifications.py`.
-
-### 4. Admin Portal: Vercel Setup
-1. Connect repository to [vercel.com](https://vercel.com).
-2. Set build settings according to `vercel.json`.
-
-### 5. Monitoring: Uptime Kuma Configuration
-1. Import `deploy/monitoring/uptime_kuma_config.json` into your Uptime Kuma instance.
-2. Configured endpoints: `/health` API check, Vercel Admin Portal check, and live `ruraluniv.ac.in` sync monitor.
-
----
-
-## 🔒 Verification & Quality Gates
-
-Run local quality checks before pushing:
-```bash
-npm run typecheck   # TypeScript Static Compiler (0 Errors)
-npm run lint        # ESLint Quality Auditor (0 Errors, 0 Warnings)
-npm test            # Jest Unit Test Suite (4/4 Passed)
-```
+### 3. Web Admin Dashboard: Vercel Setup
+1. Import repository on [vercel.com](https://vercel.com).
+2. Set Root Directory to `admin/`.
+3. Vercel automatically deploys the static Admin Control Panel UI.
