@@ -33,20 +33,27 @@ export default function LoginScreen() {
   const { setAuth } = useAuthStore();
 
   const [selectedRole, setSelectedRole] = useState<'STUDENT' | 'FACULTY' | 'STAFF' | 'ADMIN'>('STUDENT');
-  const [email, setEmail] = useState('student@test.edu');
-  const [password, setPassword] = useState('StudentPass#123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const roleOptions: { key: 'STUDENT' | 'FACULTY' | 'STAFF' | 'ADMIN'; label: string; defaultEmail: string; icon: any }[] = [
-    { key: 'STUDENT', label: 'Student', defaultEmail: 'student@test.edu', icon: GraduationCap },
-    { key: 'FACULTY', label: 'Faculty', defaultEmail: 'faculty@ruraluniv.ac.in', icon: BookOpen },
-    { key: 'STAFF', label: 'Staff', defaultEmail: 'staff@ruraluniv.ac.in', icon: Building2 },
-    { key: 'ADMIN', label: 'Admin', defaultEmail: 'admin@ruraluniv.ac.in', icon: ShieldCheck },
+  const roleOptions: { key: 'STUDENT' | 'FACULTY' | 'STAFF' | 'ADMIN'; label: string; icon: any }[] = [
+    { key: 'STUDENT', label: 'Student', icon: GraduationCap },
+    { key: 'FACULTY', label: 'Faculty', icon: BookOpen },
+    { key: 'STAFF', label: 'Staff', icon: Building2 },
+    { key: 'ADMIN', label: 'Admin', icon: ShieldCheck },
   ];
 
   const handleSelectRole = (role: 'STUDENT' | 'FACULTY' | 'STAFF' | 'ADMIN') => {
+    setSelectedRole(role);
+    setErrorMsg(null);
+    setEmail('');
+    setPassword('');
+  };
+
+  const fillDemoCredentials = (role: 'STUDENT' | 'FACULTY' | 'ADMIN') => {
     setSelectedRole(role);
     setErrorMsg(null);
     if (role === 'STUDENT') {
@@ -55,12 +62,9 @@ export default function LoginScreen() {
     } else if (role === 'ADMIN') {
       setEmail('admin@ruraluniv.ac.in');
       setPassword('Admin@GRI2026');
-    } else if (role === 'FACULTY') {
+    } else {
       setEmail('faculty@test.edu');
       setPassword('FacultyPass#123');
-    } else {
-      setEmail('staff@test.edu');
-      setPassword('StaffPass#123');
     }
   };
 
@@ -264,26 +268,26 @@ export default function LoginScreen() {
           {/* Quick Demo Switcher */}
           <View className="border-t border-gray-200 pt-4">
             <Text className="text-[11px] font-bold text-gray-500 uppercase text-center mb-2.5">
-              Quick One-Click Test Accounts
+              Fill Test Credentials (Development)
             </Text>
             <View className="flex-row justify-between">
               <TouchableOpacity
-                onPress={() => handleSelectRole('STUDENT')}
+                onPress={() => fillDemoCredentials('STUDENT')}
                 className="bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl flex-1 mr-1.5 items-center"
               >
-                <Text className="text-[11px] font-bold text-[#518214]">Student Test</Text>
+                <Text className="text-[11px] font-bold text-[#518214]">Student Demo</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => handleSelectRole('FACULTY')}
+                onPress={() => fillDemoCredentials('FACULTY')}
                 className="bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl flex-1 mx-1.5 items-center"
               >
-                <Text className="text-[11px] font-bold text-amber-800">Faculty Test</Text>
+                <Text className="text-[11px] font-bold text-amber-800">Faculty Demo</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => handleSelectRole('ADMIN')}
+                onPress={() => fillDemoCredentials('ADMIN')}
                 className="bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl flex-1 ml-1.5 items-center"
               >
-                <Text className="text-[11px] font-bold text-rose-700">Admin Test</Text>
+                <Text className="text-[11px] font-bold text-rose-700">Admin Demo</Text>
               </TouchableOpacity>
             </View>
           </View>

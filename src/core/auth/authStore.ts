@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { storage, storageKeys, getItem, setItem, removeItem } from '../storage';
+import { storage, storageKeys, getItem, setItem, removeItem, setSecureItem, getSecureItem, removeSecureItem } from '../storage';
 import { apiClient } from '../api';
 
 export type UserRole =
@@ -38,13 +38,13 @@ interface AuthState {
   isLoading: boolean;
 
   // Actions
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  setAuth: (user: User, accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (partialUser: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  const initialToken = storage.getString(storageKeys.ACCESS_TOKEN) || null;
+  const initialToken = getSecureItem(storageKeys.ACCESS_TOKEN);
   const initialUser = getItem<User>(storageKeys.USER_DATA);
 
   return {
@@ -53,9 +53,9 @@ export const useAuthStore = create<AuthState>((set) => {
     isAuthenticated: !!initialToken && !!initialUser,
     isLoading: false,
 
-    setAuth: (user, accessToken, refreshToken) => {
-      storage.set(storageKeys.ACCESS_TOKEN, accessToken);
-      storage.set(storageKeys.REFRESH_TOKEN, refreshToken);
+    setAuth: async (user, accessToken, refreshToken) => {
+      await setSecureItem(storageKeys.ACCESS_TOKEN, accessToken);
+      await setSecureItem(storageKeys.REFRESH_TOKEN, refreshToken);
       setItem(storageKeys.USER_DATA, user);
 
       set({
@@ -67,7 +67,7 @@ export const useAuthStore = create<AuthState>((set) => {
     },
 
     logout: async () => {
-      const refreshToken = storage.getString(storageKeys.REFRESH_TOKEN);
+      const refreshToken = getSecureItem(storageKeys.REFRESH_TOKEN);
       if (refreshToken) {
         try {
           await apiClient.post('/auth/logout', { refresh_token: refreshToken });
@@ -76,8 +76,8 @@ export const useAuthStore = create<AuthState>((set) => {
         }
       }
 
-      removeItem(storageKeys.ACCESS_TOKEN);
-      removeItem(storageKeys.REFRESH_TOKEN);
+      await removeSecureItem(storageKeys.ACCESS_TOKEN);
+      await removeSecureItem(storageKeys.REFRESH_TOKEN);
       removeItem(storageKeys.USER_DATA);
 
       set({

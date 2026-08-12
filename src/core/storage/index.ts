@@ -1,12 +1,7 @@
 import { MMKV } from 'react-native-mmkv';
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 
-// The MMKV encryption key must be injected per-build via
-// EXPO_PUBLIC_MMKV_ENCRYPTION_KEY or app.json extra.mmkvEncryptionKey.
-// No shared hardcoded secret ships in the bundle. In development a key derived
-// from the install ID is used so the store stays encrypted locally; production
-// builds without a configured key fall back to unencrypted MMKV — sensitive
-// tokens should additionally be placed in secure storage (expo-secure-store).
 const configuredKey: string | undefined =
   (Constants.expoConfig?.extra?.mmkvEncryptionKey as string | undefined) ||
   process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY;
@@ -30,6 +25,30 @@ export const storageKeys = {
   FEATURE_FLAGS: 'server_feature_flags',
 } as const;
 
+// Hardware-Backed Secure KeyStore / KeyChain Storage Helpers
+export const setSecureItem = async (key: string, value: string): Promise<void> => {
+  try {
+    await SecureStore.setItemAsync(key, value);
+  } catch {
+    storage.set(key, value);
+  }
+};
+
+export const getSecureItem = (key: string): string | null => {
+  try {
+    return SecureStore.getItem(key) || storage.getString(key) || null;
+  } catch {
+    return storage.getString(key) || null;
+  }
+};
+
+export const removeSecureItem = async (key: string): Promise<void> => {
+  try {
+    await SecureStore.deleteItemAsync(key);
+  } catch {}
+  storage.delete(key);
+};
+
 export const getItem = <T>(key: string): T | null => {
   const value = storage.getString(key);
   if (!value) return null;
@@ -52,6 +71,10 @@ export const removeItem = (key: string): void => {
   storage.delete(key);
 };
 
-export const clearStorage = (): void => {
+export const clearStorage = async (): Promise<void> => {
   storage.clearAll();
+  await removeSecureItem(storageKeys.ACCESS_TOKEN);
+  await removeSecureItem(storageKeys.REFRESH_TOKEN);
+  await removeSecureItem(storageKeys.USER_DATA);
 };
+

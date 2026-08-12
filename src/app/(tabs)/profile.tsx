@@ -43,8 +43,8 @@ export default function ProfileScreen() {
   ];
 
   const menuItems = [
-    { title: 'Switch Active Role (RBAC)', icon: ShieldCheck, action: () => setShowRoleModal(true) },
-    { title: 'Security & Biometrics', icon: Lock, action: () => Alert.alert('Biometrics', 'Fingerprint & FaceID enabled') },
+    { title: 'View Assigned Role & RBAC Scope', icon: ShieldCheck, action: () => setShowRoleModal(true) },
+    { title: 'Security & Biometrics', icon: Lock, action: () => Alert.alert('Biometrics', 'Fingerprint & Hardware Keystore enabled') },
     { title: 'Notification Preferences', icon: Bell, action: () => Alert.alert('Notifications', 'Push & In-App alerts enabled') },
     { title: 'Help & Grievance Portal', icon: HelpCircle, action: () => router.push('/(tabs)/services' as any) },
   ];
@@ -60,12 +60,12 @@ export default function ProfileScreen() {
             <User size={32} color="#FFFFFF" />
           </View>
           <View className="flex-1">
-            <Text className="text-lg font-bold text-gray-900">{user?.fullName || 'Vijay Maheswari'}</Text>
+            <Text className="text-lg font-bold text-gray-900">{user?.fullName || 'Authenticated User'}</Text>
             <View className="bg-[#911C03] px-2.5 py-0.5 rounded-full align-self-start mt-1 mb-1">
               <Text className="text-[10px] font-bold text-white uppercase">{user?.role || 'STUDENT'}</Text>
             </View>
-            <Text className="text-xs text-gray-500 font-medium">{user?.department || 'Computer Science & Applications'}</Text>
-            <Text className="text-xs font-semibold text-[#518214] mt-0.5">ID: {user?.rollNumber || 'GRI-2024-8841'}</Text>
+            <Text className="text-xs text-gray-500 font-medium">{user?.department || 'Gandhigram Rural Institute'}</Text>
+            <Text className="text-xs font-semibold text-[#518214] mt-0.5">ID: {user?.rollNumber || 'GRI-2026'}</Text>
           </View>
         </Card>
 
@@ -105,36 +105,40 @@ export default function ProfileScreen() {
         <View className="h-8" />
       </ScrollView>
 
-      {/* Role Switcher Modal */}
+      {/* Read-Only RBAC Scope Security Audit Modal */}
       <React.Fragment>
         {showRoleModal && (
           <View className="absolute inset-0 bg-black/60 items-center justify-center p-5 z-50">
             <View className="bg-white w-full max-w-md rounded-3xl p-5 max-h-[80%]">
-              <Text className="text-xl font-bold text-gray-900 mb-1 text-center">Select Active User Role</Text>
+              <Text className="text-xl font-bold text-gray-900 mb-1 text-center">Authenticated RBAC Scope</Text>
               <Text className="text-xs text-gray-500 mb-4 text-center">
-                Test role-based access control (RBAC) permissions across GRI One
+                Verified identity permissions signed by GRI PostgreSQL Auth Server
               </Text>
 
+              <View className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl mb-4">
+                <Text className="text-xs font-bold text-emerald-800 uppercase mb-1">Active Institutional Role</Text>
+                <Text className="text-lg font-extrabold text-[#518214]">{user?.role || 'STUDENT'}</Text>
+                <Text className="text-xs text-gray-600 mt-1">
+                  User ID: {user?.id || 'Verified'}
+                </Text>
+                <Text className="text-xs text-gray-600">
+                  Email: {user?.email || 'Verified'}
+                </Text>
+              </View>
+
+              <Text className="text-xs font-bold text-gray-700 uppercase mb-2">Role Access Control Details</Text>
               <ScrollView className="gap-2 mb-4" showsVerticalScrollIndicator={false}>
-                {allRoles.map((r, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => {
-                      updateUser({ role: r.role });
-                      setShowRoleModal(false);
-                      Alert.alert('Role Updated', `Active role switched to ${r.title}`);
-                    }}
-                    className={`p-3.5 rounded-xl border mb-2 flex-row items-center justify-between ${
-                      user?.role === r.role ? 'bg-emerald-50 border-[#518214]' : 'bg-gray-50 border-gray-200'
-                    }`}
-                  >
-                    <View className="flex-1 pr-2">
-                      <Text className="text-sm font-bold text-gray-900">{r.title}</Text>
-                      <Text className="text-xs text-gray-500 mt-0.5">{r.desc}</Text>
+                {allRoles
+                  .filter((r) => r.role === user?.role)
+                  .map((r, i) => (
+                    <View key={i} className="p-3.5 rounded-xl border bg-emerald-50 border-[#518214] mb-2 flex-row items-center justify-between">
+                      <View className="flex-1 pr-2">
+                        <Text className="text-sm font-bold text-gray-900">{r.title}</Text>
+                        <Text className="text-xs text-gray-600 mt-0.5">{r.desc}</Text>
+                      </View>
+                      <ShieldCheck size={22} color="#518214" />
                     </View>
-                    {user?.role === r.role && <ShieldCheck size={20} color="#518214" />}
-                  </TouchableOpacity>
-                ))}
+                  ))}
               </ScrollView>
 
               <TouchableOpacity

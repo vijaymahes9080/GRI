@@ -1,5 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { storage, storageKeys } from '../storage';
+import { storage, storageKeys, getSecureItem, setSecureItem, removeSecureItem } from '../storage';
 
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -28,7 +28,7 @@ export const api = apiClient;
 // Request Interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = storage.getString(storageKeys.ACCESS_TOKEN);
+    const token = getSecureItem(storageKeys.ACCESS_TOKEN);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -45,20 +45,20 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = storage.getString(storageKeys.REFRESH_TOKEN);
+      const refreshToken = getSecureItem(storageKeys.REFRESH_TOKEN);
 
       if (refreshToken) {
         try {
           const refreshResponse = await axios.post<{ access_token: string; refresh_token: string }>(
             `${API_BASE_URL}/auth/refresh`,
-            { refreshToken }
+            { refresh_token: refreshToken }
           );
 
           if (refreshResponse.data.access_token) {
             const newAccessToken = refreshResponse.data.access_token;
-            storage.set(storageKeys.ACCESS_TOKEN, newAccessToken);
+            await setSecureItem(storageKeys.ACCESS_TOKEN, newAccessToken);
             if (refreshResponse.data.refresh_token) {
-              storage.set(storageKeys.REFRESH_TOKEN, refreshResponse.data.refresh_token);
+              await setSecureItem(storageKeys.REFRESH_TOKEN, refreshResponse.data.refresh_token);
             }
 
             if (originalRequest.headers) {
@@ -69,8 +69,8 @@ apiClient.interceptors.response.use(
           }
         } catch {
           // Token refresh failed -> Clear session
-          storage.delete(storageKeys.ACCESS_TOKEN);
-          storage.delete(storageKeys.REFRESH_TOKEN);
+          await removeSecureItem(storageKeys.ACCESS_TOKEN);
+          await removeSecureItem(storageKeys.REFRESH_TOKEN);
           storage.delete(storageKeys.USER_DATA);
         }
       }
