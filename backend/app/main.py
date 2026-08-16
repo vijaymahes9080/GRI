@@ -21,6 +21,8 @@ from backend.app.api.v1.endpoints import (
     extension_cells,
     public,
     contracts,
+    admin_notifications,
+    cms,
 )
 
 app = FastAPI(
@@ -64,6 +66,8 @@ app.include_router(ai_analytics.router, prefix=f"{settings.API_V1_STR}/ai", tags
 app.include_router(erp.router, prefix=f"{settings.API_V1_STR}/erp", tags=["ERP Middleware & Webhooks"])
 app.include_router(website_sync.router, prefix=f"{settings.API_V1_STR}/website", tags=["Live Website Sync (ruraluniv.ac.in)"])
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications & Alerts"])
+app.include_router(admin_notifications.router, prefix=f"{settings.API_V1_STR}/admin/notifications", tags=["Admin Notifications Control"])
+app.include_router(cms.router, prefix=f"{settings.API_V1_STR}/cms", tags=["Dynamic Content Management"])
 app.include_router(students.router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(files.router, prefix=f"{settings.API_V1_STR}/files", tags=["Files & Parsing"])
 app.include_router(statutory.router, prefix=f"{settings.API_V1_STR}/statutory", tags=["Statutory Bodies & Regulations"])

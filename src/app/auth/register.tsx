@@ -33,10 +33,15 @@ export default function RegisterScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [universityId, setUniversityId] = useState('');
+  const [role, setRole] = useState('student');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [adminSecret, setAdminSecret] = useState('');
   const [department, setDepartment] = useState('Computer Science & Applications');
+  const [programme, setProgramme] = useState('B.Sc. Computer Science');
+  const [year, setYear] = useState('1');
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -86,25 +91,25 @@ export default function RegisterScreen() {
           );
         }
       } else {
-        // User account request for Admin approval
-        try {
-          await apiClient.post('/public/register-request', {
-            full_name: fullName.trim(),
-            email: email.trim(),
-            phone: phone.trim() || undefined,
-            department: department,
-          });
-        } catch {
-          // Fallback notice if backend offline
-        }
+        // Registration flow with channel availability
+        const response = await apiClient.post('/auth/register', {
+          full_name: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          whatsapp_number: whatsappNumber.trim() || phone.trim() || undefined,
+          university_id: universityId.trim() || undefined,
+          password: password.trim(),
+          role: role,
+          department: department,
+          programme: programme,
+          year: parseInt(year) || 1,
+        });
 
-        setSuccessMsg(
-          'Registration request submitted! Your account is pending GRI Admin approval. You will be notified once approved.'
-        );
+        setSuccessMsg('Registration successful! You can now sign in with your credentials.');
         Alert.alert(
-          'Registration Request Submitted',
-          'Account request received. GRI System Administrators will review and approve your account.',
-          [{ text: 'Return to Login', onPress: () => router.replace('/auth/login') }]
+          'Account Registered',
+          'Your GRI user account has been registered and approved.',
+          [{ text: 'Go to Sign In', onPress: () => router.replace('/auth/login') }]
         );
       }
     } catch (err: any) {

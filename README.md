@@ -94,6 +94,7 @@ build_and_install.bat
 
 ## 📄 Documentation Files
 
+- [GRI_REALTIME_COMMUNICATION_PLATFORM.md](file:///d:/current%20project/GRI/docs/GRI_REALTIME_COMMUNICATION_PLATFORM.md): Real-Time Communication Platform, 5 Open-Source Channels, Target Engine & Approval Workflow Documentation.
 - [GRI_PRODUCT_BLUEPRINT.md](file:///d:/current%20project/GRI/GRI_PRODUCT_BLUEPRINT.md): 64-Section Complete Product Blueprint and Navigation Sitemap.
 - [PROJECT_ARCHITECTURE_AUDIT.md](file:///d:/current%20project/GRI/PROJECT_ARCHITECTURE_AUDIT.md): Project Architecture and System Audit.
 - [docs/Authentication.md](file:///d:/current%20project/GRI/docs/Authentication.md): Comprehensive Authentication & Admin Permission Documentation.

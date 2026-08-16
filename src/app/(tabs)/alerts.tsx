@@ -1,147 +1,216 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
-import { Bell, Calendar, FileSpreadsheet, Briefcase, ExternalLink, ShieldAlert, Award } from 'lucide-react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Linking, RefreshControl } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Bell, Calendar, FileSpreadsheet, Briefcase, ExternalLink, ShieldAlert, Tag, CheckCheck } from 'lucide-react-native';
 import { Header } from '../../components/Header';
-import { GRI_INSTITUTIONAL_DATA } from '../../core/services/institutionalData';
+import { apiClient } from '../../core/api';
+
+interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  priority: string;
+  attachment_url?: string;
+  deep_link?: string;
+  published_at?: string;
+  read_status: string;
+}
 
 export default function AlertsScreen() {
-  const [filter, setFilter] = useState<'ALL' | 'CIRCULARS' | 'EVENTS' | 'TENDERS' | 'CAREERS'>('ALL');
+  const router = useRouter();
+  const [filter, setFilter] = useState<'ALL' | 'UNREAD' | 'CIRCULARS' | 'EVENTS'>('ALL');
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await apiClient.get('/notifications');
+      if (res.data && res.data.notifications) {
+        setNotifications(res.data.notifications);
+        setUnreadCount(res.data.unread_count || 0);
+      }
+    } catch {
+      // Offline fallback mock data
+      setNotifications([
+        {
+          id: 'NOTIF-001',
+          title: 'Semester Examination Timetable Published',
+          message: 'The final semester exam timetable for Autumn 2026 is now available on the portal.',
+          category: 'exam',
+          priority: 'URGENT',
+          published_at: new Date().toISOString(),
+          read_status: 'unread',
+        },
+        {
+          id: 'NOTIF-002',
+          title: 'Campus Convocation Registration Open',
+          message: 'Eligible candidates for 2026 Convocation can submit degree applications online.',
+          category: 'academic',
+          priority: 'NORMAL',
+          published_at: new Date().toISOString(),
+          read_status: 'read',
+        },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+
+    // WebSocket real-time connection
+    const ws = new WebSocket('ws://localhost:8000/ws/announcements');
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'NOTIFICATION' || data.type === 'EMERGENCY_ALERT') {
+          fetchNotifications();
+        }
+      } catch {}
+    };
+
+    return () => ws.close();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
+
+  const markAllRead = async () => {
+    try {
+      await apiClient.post('/notifications/read-all');
+      setUnreadCount(0);
+      setNotifications((prev) => prev.map((n) => ({ ...n, read_status: 'read' })));
+    } catch {}
+  };
+
+  const filteredItems = notifications.filter((n) => {
+    if (filter === 'UNREAD') return n.read_status === 'unread';
+    if (filter === 'CIRCULARS') return n.category === 'circular' || n.category === 'academic';
+    if (filter === 'EVENTS') return n.category === 'events' || n.category === 'event';
+    return true;
+  });
 
   return (
     <View className="flex-1 bg-gray-50">
-      <Header title="University Alerts" subtitle="Circulars · Events · Tenders · Careers" variant="green" />
+      <Header
+        title="University Alerts & Notifications"
+        subtitle={`Real-Time Announcements · ${unreadCount} Unread`}
+        variant="green"
+      />
 
-      <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        {/* Filter Pills */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+      {/* Top Action Bar */}
+      <View className="flex-row items-center justify-between px-4 py-2.5 bg-white border-b border-gray-200">
+        <View className="flex-row items-center">
+          <Bell size={18} color="#518214" />
+          <Text className="text-xs font-bold text-gray-800 ml-1.5">
+            Inbox ({notifications.length})
+          </Text>
+          {unreadCount > 0 && (
+            <View className="ml-2 bg-red-600 px-2 py-0.5 rounded-full">
+              <Text className="text-[10px] font-bold text-white">{unreadCount} NEW</Text>
+            </View>
+          )}
+        </View>
+
+        <TouchableOpacity onPress={markAllRead} className="flex-row items-center">
+          <CheckCheck size={16} color="#518214" />
+          <Text className="text-xs font-bold text-[#518214] ml-1">Mark All Read</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Filter Tabs */}
+      <View className="px-4 py-3 bg-white border-b border-gray-200">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {[
-            { id: 'ALL', label: 'All Alerts', icon: Bell },
-            { id: 'CIRCULARS', label: 'Circulars', icon: ShieldAlert },
-            { id: 'EVENTS', label: 'Events', icon: Calendar },
-            { id: 'TENDERS', label: 'Tenders', icon: FileSpreadsheet },
-            { id: 'CAREERS', label: 'Careers', icon: Briefcase },
+            { id: 'ALL', label: 'All Alerts' },
+            { id: 'UNREAD', label: `Unread (${unreadCount})` },
+            { id: 'CIRCULARS', label: 'Academic & Circulars' },
+            { id: 'EVENTS', label: 'Events' },
           ].map((item) => {
-            const Icon = item.icon;
             const isActive = filter === item.id;
             return (
               <TouchableOpacity
                 key={item.id}
                 onPress={() => setFilter(item.id as any)}
-                className={`flex-row items-center px-3.5 py-2 rounded-xl mr-2.5 border ${
-                  isActive ? 'bg-[#911C03] border-[#911C03]' : 'bg-white border-gray-200'
+                className={`px-3.5 py-1.5 rounded-xl mr-2 border ${
+                  isActive ? 'bg-[#518214] border-[#518214]' : 'bg-gray-100 border-gray-200'
                 }`}
               >
-                <Icon size={15} color={isActive ? '#FFFFFF' : '#4B5563'} />
-                <Text className={`text-xs font-bold ml-1.5 ${isActive ? 'text-white' : 'text-gray-700'}`}>
+                <Text className={`text-xs font-bold ${isActive ? 'text-white' : 'text-gray-700'}`}>
                   {item.label}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
+      </View>
 
-        {/* CIRCULARS SECTION */}
-        {(filter === 'ALL' || filter === 'CIRCULARS') && (
-          <View className="mb-5">
-            <View className="flex-row items-center justify-between mb-2.5">
-              <Text className="text-base font-bold text-gray-900">📢 Official Circulars</Text>
-              <Text className="text-xs text-[#911C03] font-semibold">Latest Sync</Text>
-            </View>
-            {GRI_INSTITUTIONAL_DATA.circulars.map((circ) => (
-              <View key={circ.id} className="bg-white p-4 rounded-xl mb-3 border border-gray-200 shadow-sm">
-                <View className="flex-row items-center justify-between mb-1.5">
-                  <Text className="text-[10px] font-bold text-red-800 bg-red-50 px-2 py-0.5 rounded-md">
-                    {circ.category}
+      <ScrollView
+        className="flex-1 px-4 pt-4"
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#518214']} />}
+      >
+        {filteredItems.length === 0 ? (
+          <View className="items-center justify-center py-16">
+            <Bell size={48} color="#94a3b8" />
+            <Text className="text-gray-500 font-bold text-base mt-3">No Notifications Found</Text>
+            <Text className="text-gray-400 text-xs text-center mt-1">You are all caught up with university announcements.</Text>
+          </View>
+        ) : (
+          filteredItems.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() =>
+                router.push({
+                  pathname: '/notifications/[id]',
+                  params: {
+                    id: item.id,
+                    title: item.title,
+                    message: item.message,
+                    category: item.category,
+                    priority: item.priority,
+                    attachment_url: item.attachment_url,
+                    deep_link: item.deep_link,
+                    published_at: item.published_at,
+                  },
+                })
+              }
+              className={`p-4 rounded-xl mb-3 border ${
+                item.read_status === 'unread'
+                  ? 'bg-emerald-50/60 border-emerald-300'
+                  : 'bg-white border-gray-200'
+              } shadow-sm`}
+            >
+              <View className="flex-row items-center justify-between mb-1.5">
+                <View className="flex-row items-center space-x-2">
+                  <Text className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md uppercase">
+                    {item.category || 'General'}
                   </Text>
-                  <Text className="text-[11px] text-gray-400">{circ.publishDate}</Text>
+                  {item.priority === 'URGENT' && (
+                    <Text className="text-[10px] font-bold text-red-800 bg-red-100 px-2 py-0.5 rounded-md uppercase">
+                      🚨 Urgent
+                    </Text>
+                  )}
                 </View>
-                <Text className="text-sm font-bold text-gray-900 mb-2">{circ.title}</Text>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(circ.pdfUrl)}
-                  className="flex-row items-center"
-                >
-                  <ExternalLink size={14} color="#518214" />
-                  <Text className="text-xs font-bold text-[#518214] ml-1">Download Circular PDF</Text>
-                </TouchableOpacity>
+                <Text className="text-[11px] text-gray-400">
+                  {item.published_at ? new Date(item.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
+                </Text>
               </View>
-            ))}
-          </View>
-        )}
 
-        {/* EVENTS SECTION */}
-        {(filter === 'ALL' || filter === 'EVENTS') && (
-          <View className="mb-5">
-            <Text className="text-base font-bold text-gray-900 mb-2.5">📅 Upcoming Events & Seminars</Text>
-            {GRI_INSTITUTIONAL_DATA.events.map((evt) => (
-              <View key={evt.id} className="bg-white p-4 rounded-xl mb-3 border border-gray-200 shadow-sm">
-                <View className="flex-row items-center justify-between mb-1.5">
-                  <Text className="text-[10px] font-bold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded-md">
-                    {evt.category}
-                  </Text>
-                  <Text className="text-xs font-bold text-indigo-600">{evt.eventDate}</Text>
-                </View>
-                <Text className="text-sm font-bold text-gray-900 mb-1">{evt.title}</Text>
-                <Text className="text-xs text-gray-600 mb-1">Organizer: {evt.organizer}</Text>
-                <Text className="text-xs text-gray-500 mb-2.5">📍 {evt.venue}</Text>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(evt.link)}
-                  className="bg-[#518214] py-2 rounded-lg items-center"
-                >
-                  <Text className="text-xs font-bold text-white">Event Registration & Details</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
+              <Text className="text-sm font-bold text-gray-900 mb-1">{item.title}</Text>
+              <Text className="text-xs text-gray-600 mb-2" numberOfLines={2}>{item.message}</Text>
 
-        {/* TENDERS SECTION */}
-        {(filter === 'ALL' || filter === 'TENDERS') && (
-          <View className="mb-5">
-            <Text className="text-base font-bold text-gray-900 mb-2.5">📑 Tenders & Public Procurement</Text>
-            {GRI_INSTITUTIONAL_DATA.tenders.map((tend) => (
-              <View key={tend.tenderNo} className="bg-white p-4 rounded-xl mb-3 border border-gray-200 shadow-sm">
-                <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-xs font-mono font-bold text-gray-500">{tend.tenderNo}</Text>
-                  <Text className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
-                    {tend.status}
-                  </Text>
-                </View>
-                <Text className="text-sm font-bold text-gray-900 mb-1.5">{tend.title}</Text>
-                <Text className="text-xs text-red-600 font-semibold mb-2">⏰ Deadline: {tend.closingDate}</Text>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(tend.documentUrl)}
-                  className="flex-row items-center"
-                >
-                  <ExternalLink size={14} color="#0D47A1" />
-                  <Text className="text-xs font-bold text-[#0D47A1] ml-1">Download Tender Document PDF</Text>
-                </TouchableOpacity>
+              <View className="flex-row items-center justify-between pt-1 border-t border-gray-100">
+                <Text className="text-[11px] font-bold text-[#518214]">Tap to view details →</Text>
+                {item.read_status === 'unread' && (
+                  <View className="w-2 h-2 rounded-full bg-emerald-600" />
+                )}
               </View>
-            ))}
-          </View>
-        )}
-
-        {/* CAREERS SECTION */}
-        {(filter === 'ALL' || filter === 'CAREERS') && (
-          <View className="mb-5">
-            <Text className="text-base font-bold text-gray-900 mb-2.5">💼 Career & Recruitment Vacancies</Text>
-            {GRI_INSTITUTIONAL_DATA.careers.map((car) => (
-              <View key={car.advtNo} className="bg-white p-4 rounded-xl mb-3 border border-gray-200 shadow-sm">
-                <Text className="text-xs font-mono font-bold text-emerald-700 mb-0.5">{car.advtNo}</Text>
-                <Text className="text-sm font-bold text-gray-900 mb-1">{car.postName}</Text>
-                <Text className="text-xs text-gray-600 mb-1">Dept: {car.department} · Scale: {car.salary}</Text>
-                <Text className="text-xs text-gray-500 mb-2">Qual: {car.qualification}</Text>
-                <View className="flex-row items-center justify-between border-t border-gray-100 pt-2.5">
-                  <Text className="text-xs font-bold text-red-600">Last Date: {car.lastDate}</Text>
-                  <TouchableOpacity
-                    onPress={() => Linking.openURL(car.pdfUrl)}
-                    className="bg-[#518214] px-3 py-1.5 rounded-lg"
-                  >
-                    <Text className="text-xs font-bold text-white">View Prospectus</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
+            </TouchableOpacity>
+          ))
         )}
       </ScrollView>
     </View>

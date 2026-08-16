@@ -45,13 +45,26 @@ class LoginRequest(BaseModel):
 
 
 class AdminRegisterRequest(BaseModel):
-    """Only admins can self-register. All other roles are created by admin."""
+    """Only admins can self-register with secret key."""
     email: EmailStr
     password: str = Field(..., min_length=8, description="Minimum 8 characters")
     full_name: str = Field(..., min_length=2, max_length=200)
     phone: Optional[str] = None
-    # Secret key to prevent public admin account creation
     admin_secret: str = Field(..., description="Admin registration secret key")
+
+
+class UserRegisterRequest(BaseModel):
+    """User registration for Students, Faculty, Staff, and Others."""
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    full_name: str = Field(..., min_length=2, max_length=200)
+    phone: Optional[str] = None
+    whatsapp_number: Optional[str] = None
+    university_id: Optional[str] = None
+    role: str = Field("student", description="student|faculty|staff|other")
+    department: Optional[str] = None
+    programme: Optional[str] = None
+    year: Optional[int] = Field(1, ge=1, le=5)
 
 
 from pydantic import AliasChoices, BaseModel, EmailStr, Field
@@ -280,6 +293,51 @@ async def login(
         full_name=user.full_name,
         email=user.email,
     )
+
+
+@router.post("/register", summary="Register standard user (Student, Faculty, Staff, Other)")
+async def register_user(
+    request: Request,
+    body: UserRegisterRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    ip = _client_ip(request)
+    existing = await _get_user_by_email(db, body.email)
+    if existing:
+        raise HTTPException(status_code=400, detail="User with this email already exists.")
+
+    role_res = await db.execute(select(Role).where(Role.name == body.role))
+    role_obj = role_res.scalars().first()
+    if not role_obj:
+        role_res = await db.execute(select(Role).where(Role.name == "student"))
+        role_obj = role_res.scalars().first()
+
+    pw_hash = get_password_hash(body.password)
+    user = User(
+        email=body.email,
+        password_hash=pw_hash,
+        full_name=body.full_name,
+        phone=body.phone,
+        whatsapp_number=body.whatsapp_number or body.phone,
+        university_id=body.university_id,
+        role_id=role_obj.id if role_obj else None,
+        approval_status="approved",  # direct approval for verified registration flow
+        is_active=True,
+        is_email_verified=True,
+        programme=body.programme,
+        current_year=body.year or 1,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
+    return {
+        "detail": "User registered successfully.",
+        "user_id": str(user.id),
+        "email": user.email,
+        "role": body.role,
+        "approval_status": "approved",
+    }
 
 
 # =============================================================================

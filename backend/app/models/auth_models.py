@@ -57,7 +57,13 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     phone: Mapped[Optional[str]] = mapped_column(String(20))
+    whatsapp_number: Mapped[Optional[str]] = mapped_column(String(20))
+    university_id: Mapped[Optional[str]] = mapped_column(String(50))
     full_name: Mapped[Optional[str]] = mapped_column(Text)
+    department_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("core.departments.id"), nullable=True)
+    programme: Mapped[Optional[str]] = mapped_column(Text)
+    batch_year: Mapped[Optional[int]] = mapped_column(nullable=True)
+    current_year: Mapped[Optional[int]] = mapped_column(nullable=True, default=1)
     notes: Mapped[Optional[str]] = mapped_column(Text)
 
     # Role FK

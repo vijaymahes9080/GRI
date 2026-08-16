@@ -42,10 +42,19 @@ export default function ProfileScreen() {
     { role: 'SYSTEM_ADMIN', title: 'System Admin', desc: 'RBAC Permissions & Audit Logs' },
   ];
 
+  const [showPreferences, setShowPreferences] = React.useState(false);
+  const [preferences, setPreferences] = React.useState({
+    push: true,
+    email: true,
+    whatsapp: true,
+    sms: true,
+    emergency: true,
+  });
+
   const menuItems = [
     { title: 'View Assigned Role & RBAC Scope', icon: ShieldCheck, action: () => setShowRoleModal(true) },
     { title: 'Security & Biometrics', icon: Lock, action: () => Alert.alert('Biometrics', 'Fingerprint & Hardware Keystore enabled') },
-    { title: 'Notification Preferences', icon: Bell, action: () => Alert.alert('Notifications', 'Push & In-App alerts enabled') },
+    { title: 'Notification Preferences (Push/Email/WhatsApp/SMS)', icon: Bell, action: () => setShowPreferences(!showPreferences) },
     { title: 'Help & Grievance Portal', icon: HelpCircle, action: () => router.push('/(tabs)/services' as any) },
   ];
 
