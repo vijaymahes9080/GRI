@@ -1,102 +1,69 @@
-# GRI Mobile App & Web Administration System
+# GRI Mobile App & Enterprise University System
 
-Official 100% Native Mobile Application and Admin Control System for **The Gandhigram Rural Institute (Deemed to be University)**, Gandhigram, Dindigul, Tamil Nadu, India.
+Official Mobile Application and Digital Workspace for **The Gandhigram Rural Institute (Deemed to be University)**, Gandhigram, Dindigul, Tamil Nadu, India.
 
 ---
 
 ## 🏛️ Application Architecture & Key Features
 
-This application is built as a **pure native mobile application** using React Native, Expo Router, NativeWind (Tailwind CSS), Lucide Icons, FastAPI Backend, and PostgreSQL database.
+This application is built using **React Native 0.74**, **Expo SDK 51**, **TypeScript**, **FastAPI Microservices Gateway**, and **PostgreSQL Database**.
 
 ### 📱 5-Tab Navigation Structure
-- **Home (`src/app/(tabs)/index.tsx`)**: Main University Dashboard with announcements, quick action tiles, stats, and press releases.
-- **Explore (`src/app/(tabs)/discover.tsx`)**: Complete Category Directory for About, Governance, Administration, Academics, Admissions, Facilities, Infrastructure, Research, E-News, Alumni.
-- **Services (`src/app/(tabs)/services.tsx`)**: Examination System, ESE Timetable Query Tool, e-SANAD, Ph.D. Tracker, Sub-Portals Hub, Downloads.
-- **Alerts (`src/app/(tabs)/alerts.tsx`)**: Filterable Circulars, Exam Notices, Admission Deadlines, Tenders, Careers.
-- **Profile (`src/app/(tabs)/profile.tsx`)**: Authenticated Portal Switcher for Student, Scholar, Faculty, Staff, and Alumni portals.
+- **Home (`src/app/(tabs)/home.tsx`)**: Main University Overview with announcements, quick action tiles, academic stats, search bar, and personalized student/staff workspace banner.
+- **Discover (`src/app/(tabs)/discover.tsx`)**: Complete Institutional Directory following GRI's official hierarchy (About, Governance, Administration, Academics, Admissions, Research, Campus, Placement, Alumni, E-News).
+- **Services (`src/app/(tabs)/services.tsx`)**: Task-based actions ("I want to perform an action") including Digital Student ID Card, Samarth Fee Portal, Examination & Results, Hostel Out-Pass, Library OPAC, Grievances, Document Vault, and Transport.
+- **Alerts (`src/app/(tabs)/alerts.tsx`)**: Real-Time Notification Center with categories (All, Urgent, Academic, Exam) connected via WebSocket environment URL (`EXPO_PUBLIC_API_URL`).
+- **Profile (`src/app/(tabs)/profile.tsx`)**: Personalized Workspace with Anonymous view (Login, Register, Help) vs Authenticated view (My Profile, My Role, Academic Info, My Documents, Security, Logout, Admin Panel).
 
 ---
 
-## 🔑 Authentication, Admin Permission & Multi-Role System
+## 🎨 Centralized Design System (`src/components/ui/`)
 
-A complete **Multi-Role Authentication & Permission Engine** is built into the backend (`/api/v1/auth` & `/api/v1/admin`):
-
-- **Admin Role**: Self-registers using an administrative secret key + full access to all system modules, user approvals, and real-time broadcasts.
-- **Student, Faculty, Staff, and Other Roles**: Accounts are created and pre-approved directly by the Admin. Users can only log in once approved by the Admin.
-- **Approval Workflow**: Users have `approval_status IN ('approved', 'pending', 'rejected', 'suspended')`. Unapproved logins are rejected with detailed status responses.
-
----
-
-## 📣 Real-Time Omnichannel Notification Broadcasting
-
-The **Admin Control Panel** ([`admin/index.html`](file:///d:/current%20project/GRI/admin/index.html)) provides a real-time notification broadcast hub:
-- **Target Audience Filter**: Broadcast to **All Users**, **Students Only**, **Faculty Only**, **Staff Only**, or **Others**.
-- **Dispatch Channels**: In-App Push Notifications (via WebSockets `/ws/announcements` & FCM), Email Alerts, SMS Text Messages, WhatsApp Business.
-- **Live Audit & History**: Stored permanently in PostgreSQL database table `infra.notifications`.
+- **`tokens.ts`**: Single source of truth for colors (Gandhigram Green `#518214`, Deep Maroon `#911C03`, Saffron `#F16236`), 4px-grid spacing scale, radii, typography, and elevation shadows.
+- **`Screen.tsx`**: Universal SafeAreaView wrapper accounting for `useSafeAreaInsets()`, statusBar translucency, and KeyboardAvoidingView. Eliminates tab bar overlap on Android gesture navigation.
+- **`ScreenHeader.tsx`**: Consistent header with proper 44pt touch targets and accessibility support.
+- **`Cards.tsx`**: Typed card components (`AnnouncementCard`, `ServiceCard`, `InformationCard`, `StatCard`, `CategoryCard`).
+- **`States.tsx`**: Standardized `LoadingState`, `SkeletonCard`, `EmptyState`, `ErrorState`, `OfflineState`, and `NoResultsState`.
+- **`SearchBar.tsx` & `ListItem.tsx`**: Unified search and directory list row components.
 
 ---
 
-## 💾 Open-Source PostgreSQL Online Database Architecture
+## 🧭 Centralized Navigation Engine (`src/navigation/`)
 
-- **PostgreSQL Database Schema**:
-  - `database/schema.sql` — Core institutional schemas (`core`, `academic`, `exam`, `campus`, `finance`, `placement`, `research`, `ai`, `infra`).
-  - `database/schema_v2_extension.sql` — Server-Driven Remote Config, Feature Flags, Navigation Nodes, Unified Content.
-  - `database/schema_auth_extension.sql` — Approval Status, Seed Roles (`admin`, `student`, `faculty`, `staff`, `other`), `sessions`, `audit_log`, `staff_profiles`.
-- **Async Database Connection**: SQLAlchemy 2.0 + `asyncpg` driver supporting Supabase, Railway, Neon, or self-hosted open-source PostgreSQL.
+- **`navigation.config.ts`**: Master configuration mapping the complete GRI website hierarchy into Discover categories and task-based Services.
+- **`navigation.permissions.ts`**: Evaluates node visibility based on user role and feature flags.
+- **`navigation.resolver.ts`**: `navigationResolver` executes safe, permission-checked navigation and handles deep links (`gri://...`).
 
 ---
 
-## 🧪 Verified Test Suite & Quality Status
+## 🔒 Authentication, Security & Admin Control
 
-The backend includes a comprehensive automated test suite verified with `pytest`:
-```bash
-python -m pytest backend/tests/
-# Result: 37 passed in 8.35s (100% passing)
-```
-
----
-
-## 📂 Dedicated Route Modules Structure
-
-Over 100 dedicated page route screens are implemented under `src/app/`:
-
-```text
-src/app/
-├── (tabs)/                 # 5-Tab Bottom Navigation Bar
-├── about/                  # About GRI (History, Vision, NAAC 'A', Regulations, Profile, Staff)
-├── governance/             # Governance (BoM, Society, Academic Council, Finance Committee)
-├── administration/         # Administration (Chancellor, VC, Registrar, CoE, FO, CVO, Deans)
-├── academics/              # Academics (7 Schools, 30+ Departments, CBCS, Department Detail Template)
-├── admissions/             # Admissions (UG, PG, Ph.D., Fee Refund Policy, Hostel Fee, Prospectus)
-├── examination/            # Examinations (ESE Timetable Tool, Transcripts, Ph.D. Tracker, e-SANAD)
-├── facilities/             # Facilities (Central Library & OPAC, Computer Centre & NKN, Labs)
-├── infrastructure/         # Infrastructure (Hostels, Guest House, Health Centre, Canteen)
-├── research/               # Research (RDC Policy, Patents, Projects, Scholars)
-├── alumni/                 # Alumni Association (Registration, Reunions, RaiseGRI Fund)
-├── enews/                  # E-News & Press Releases (Circulars, Tenders, Archives)
-├── auth/                   # Authenticated Portals (Student, Scholar, Dept Login)
-├── navigation.tsx          # Master Directory Screen with Search
-└── search/                 # Global Search Engine across 220+ topics
-```
+- **Server-Side Role Enforcement (SEC-001)**: Public registration (`POST /api/v1/auth/register`) forces `role="student"` and `approval_status="pending"` server-side. Client-supplied role is ignored. Account requires admin approval before initial login.
+- **Admin Self-Registration Removed (SEC-002)**: Public admin registration endpoint is removed (`HTTP 410 Gone`). Admin accounts can only be provisioned server-side or by existing admins via `POST /admin/users/create`.
+- **Development Backdoor Removed (SEC-003)**: Mock logins only activate if `ALLOW_MOCK_USERS=true` and environment is not production.
+- **Admin Route Guard (SEC-006)**: `AdminGuard` component prevents non-admin users from viewing `/admin/*` screens on the client.
+- **Strict DB Admin Lookup (SEC-008)**: Admin endpoints verify DB user status. Unreachable DB returns `503 Service Unavailable` instead of operating on dummy fallback claims.
+- **No Hardcoded Credentials (SEC-009)**: Removed demo credentials and client role selector from login screen.
 
 ---
 
-## 🛠️ Build & USB Deployment (16KB Page-Aligned Standalone APK)
+## 🌐 Parameterized Content & Global Search
 
-The application is configured to build an **offline standalone APK** with pre-bundled Hermes JavaScript assets and 16KB page alignment.
-
-### Execution Command:
-```cmd
-build_and_install.bat
-```
+- **Universal Detail Route (`src/app/content/[type]/[id].tsx`)**: Consolidates static pages into a single reusable parameterized detail route that dynamically loads content from backend APIs or local institutional data.
+- **Centralized Global Search (`src/app/search/index.tsx`)**: Global search screen searching across departments, academics, services, and documents with category filter chips.
 
 ---
 
-## 📄 Documentation Files
+## 🧪 Verified Quality Status
 
-- [GRI_REALTIME_COMMUNICATION_PLATFORM.md](file:///d:/current%20project/GRI/docs/GRI_REALTIME_COMMUNICATION_PLATFORM.md): Real-Time Communication Platform, 5 Open-Source Channels, Target Engine & Approval Workflow Documentation.
-- [GRI_PRODUCT_BLUEPRINT.md](file:///d:/current%20project/GRI/GRI_PRODUCT_BLUEPRINT.md): 64-Section Complete Product Blueprint and Navigation Sitemap.
-- [PROJECT_ARCHITECTURE_AUDIT.md](file:///d:/current%20project/GRI/PROJECT_ARCHITECTURE_AUDIT.md): Project Architecture and System Audit.
-- [docs/Authentication.md](file:///d:/current%20project/GRI/docs/Authentication.md): Comprehensive Authentication & Admin Permission Documentation.
-- [docs/Database.md](file:///d:/current%20project/GRI/docs/Database.md): PostgreSQL Database Schema & Migration Guide.
-- [docs/notifications_architecture.md](file:///d:/current%20project/GRI/docs/notifications_architecture.md): Real-Time Broadcast Notification System Guide.
+- **Backend Test Suite (`pytest backend/tests/`)**: **40/40 Passed (100%)**
+- **TypeScript Typecheck (`npx tsc --noEmit`)**: **0 Errors (100%)**
+- **Frontend Jest Suite (`npx jest`)**: **4/4 Passed (100%)**
+
+---
+
+## ⚡ Batch Scripts (.bat)
+
+- `run_dev.bat` — 1-click startup for FastAPI backend server & Expo Metro bundler.
+- `build_and_install.bat` — Full standalone release APK build, 16KB page-alignment, signing, and USB deployment.
+- `install_to_phone.bat` — USB port forwarding (8081 & 8000), debug APK alignment, signing, and ADB deployment.
