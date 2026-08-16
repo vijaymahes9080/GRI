@@ -53,6 +53,12 @@ async def _require_admin(
     credentials: HTTPAuthorizationCredentials = Depends(_bearer),
     db: AsyncSession = Depends(get_db),
 ) -> User:
+    """Strict admin guard — requires both a valid JWT AND a verified DB user record.
+
+    SEC-008 FIX: Removed the dummy admin fallback that previously allowed admin
+    operations to continue when the database was unreachable.  Security must never
+    degrade gracefully.  If the DB is unavailable, admin endpoints return 503.
+    """
     if not credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated.")
 
@@ -66,25 +72,42 @@ async def _require_admin(
             detail="Admin access required.",
         )
 
+    # DB lookup is mandatory — we never operate on unverified JWT claims alone.
     try:
         user = await db.get(User, payload.get("sub"))
-        if user and not user.deleted_at:
-            await db.refresh(user, ["role"])
-            return user
     except Exception as exc:
-        logger.warning("DB query in _require_admin failed, proceeding with token admin claim: %s", exc)
+        logger.error("DB unavailable during admin auth check: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Admin operations require database connectivity. Please try again.",
+        )
 
-    # Fallback admin user object if DB is offline
-    dummy_admin = User(
-        id=uuid.UUID(payload.get("sub", "00000000-0000-0000-0000-000000000000")),
-        email=payload.get("email", "admin@ruraluniv.ac.in"),
-        full_name="GRI System Administrator",
-        approval_status="approved",
-        is_active=True,
-    )
-    dummy_role = Role(name="admin")
-    dummy_admin.role = dummy_role
-    return dummy_admin
+    if not user or user.deleted_at:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin user account not found or has been removed.",
+        )
+
+    if not user.can_login:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin account is inactive or pending approval.",
+        )
+
+    await db.refresh(user, ["role"])
+
+    # Double-check DB role — JWT role could be stale if demoted.
+    if user.role.name != "admin":
+        logger.warning(
+            "[SECURITY] JWT claims admin role but DB role is '%s'. user_id=%s",
+            user.role.name, user.id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access denied. Your role has changed. Please log in again.",
+        )
+
+    return user
 
 
 # =============================================================================

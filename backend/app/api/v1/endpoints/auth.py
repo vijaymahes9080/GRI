@@ -54,14 +54,19 @@ class AdminRegisterRequest(BaseModel):
 
 
 class UserRegisterRequest(BaseModel):
-    """User registration for Students, Faculty, Staff, and Others."""
+    """User self-registration — role is always 'student'; account requires admin approval.
+
+    NOTE: The 'role' field is intentionally excluded.  The backend forces
+    role='student' and approval_status='pending' regardless of what the
+    client sends. Privileged roles (faculty, staff, admin, etc.) are
+    created exclusively by admins via POST /admin/users/create.
+    """
     email: EmailStr
-    password: str = Field(..., min_length=6)
+    password: str = Field(..., min_length=8, description="Minimum 8 characters")
     full_name: str = Field(..., min_length=2, max_length=200)
     phone: Optional[str] = None
     whatsapp_number: Optional[str] = None
     university_id: Optional[str] = None
-    role: str = Field("student", description="student|faculty|staff|other")
     department: Optional[str] = None
     programme: Optional[str] = None
     year: Optional[int] = Field(1, ge=1, le=5)
@@ -179,10 +184,13 @@ async def login(
     except Exception as exc:
         logger.warning("DB query failed, checking fallback mock users: %s", exc)
 
-    # Fallback for dev/testing if DB is offline or mock user requested
-    if not user and (settings.ALLOW_MOCK_USERS or settings.ENVIRONMENT == "development" or body.email in MOCK_TEST_USERS):
+    # Fallback for dev/testing — ONLY when ALLOW_MOCK_USERS=true (never in production).
+    # SEC-003 FIX: removed the unconditional `body.email in MOCK_TEST_USERS` check
+    # that allowed bypassing ALLOW_MOCK_USERS when the email matched a known mock.
+    if not user and settings.ALLOW_MOCK_USERS and settings.ENVIRONMENT != "production":
         mock_info = MOCK_TEST_USERS.get(body.email)
         if mock_info and verify_password(body.password, mock_info["password_hash"]):
+            logger.info("[DEV] Mock user login: email=%s role=%s", mock_info["email"], mock_info["role"])
             token_data = {"sub": mock_info["id"], "email": mock_info["email"], "role": mock_info["role"]}
             access_token = create_access_token(token_data)
             refresh_token = create_refresh_token(token_data)
@@ -295,22 +303,34 @@ async def login(
     )
 
 
-@router.post("/register", summary="Register standard user (Student, Faculty, Staff, Other)")
+@router.post("/register", summary="Register as a student (pending admin approval)")
 async def register_user(
     request: Request,
     body: UserRegisterRequest,
     db: AsyncSession = Depends(get_db),
 ):
+    """Public self-registration endpoint.
+
+    Security rules enforced server-side (regardless of client input):
+    - Role is ALWAYS forced to 'student'.
+    - approval_status is ALWAYS 'pending' — admin must approve before login.
+    - Privileged roles (faculty, staff, admin) can ONLY be created by
+      admins via POST /admin/users/create.
+    """
     ip = _client_ip(request)
     existing = await _get_user_by_email(db, body.email)
     if existing:
         raise HTTPException(status_code=400, detail="User with this email already exists.")
 
-    role_res = await db.execute(select(Role).where(Role.name == body.role))
-    role_obj = role_res.scalars().first()
-    if not role_obj:
-        role_res = await db.execute(select(Role).where(Role.name == "student"))
-        role_obj = role_res.scalars().first()
+    # SEC-001 FIX: Always resolve 'student' role — never trust client-supplied role.
+    role_res = await db.execute(select(Role).where(Role.name == "student"))
+    student_role = role_res.scalars().first()
+    if not student_role:
+        logger.error("'student' role missing from DB — run schema migrations.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration is temporarily unavailable. Please contact the administrator.",
+        )
 
     pw_hash = get_password_hash(body.password)
     user = User(
@@ -320,124 +340,73 @@ async def register_user(
         phone=body.phone,
         whatsapp_number=body.whatsapp_number or body.phone,
         university_id=body.university_id,
-        role_id=role_obj.id if role_obj else None,
-        approval_status="approved",  # direct approval for verified registration flow
+        role_id=student_role.id,  # SEC-001: always student, never from client
+        approval_status="pending",  # SEC-001: must be approved by admin before login
         is_active=True,
-        is_email_verified=True,
+        is_email_verified=False,
         programme=body.programme,
         current_year=body.year or 1,
     )
     db.add(user)
+
+    await _log_audit(
+        db, actor_id=user.id, action="self_register",
+        target_user_id=user.id, target_email=user.email,
+        metadata={"role": "student", "approval_status": "pending"},
+        ip_address=ip,
+        user_agent=request.headers.get("user-agent", ""),
+    )
+
     await db.commit()
     await db.refresh(user)
 
+    logger.info("New student registration pending approval: email=%s ip=%s", user.email, ip)
+
     return {
-        "detail": "User registered successfully.",
+        "detail": "Registration submitted. Your account is pending administrator approval. You will be notified once approved.",
         "user_id": str(user.id),
         "email": user.email,
-        "role": body.role,
-        "approval_status": "approved",
+        "role": "student",
+        "approval_status": "pending",
     }
 
 
 # =============================================================================
-# POST /auth/admin/register
-# Admin self-registration — protected by ADMIN_REGISTER_SECRET env var.
-# Students, Staff, and Other are created exclusively by admin (not here).
+# POST /auth/admin/register  — DEPRECATED / REMOVED (SEC-002)
 # =============================================================================
-
-ADMIN_REGISTER_SECRET = os.getenv("ADMIN_REGISTER_SECRET", "GRI_ADMIN_SECRET_CHANGE_ME")
-
+# Admin accounts must be provisioned server-side by an existing admin via
+# POST /admin/users/create, or by running the server-side CLI seed script.
+# Public self-registration for admin accounts is a critical security risk
+# and has been permanently removed from this API.
+# =============================================================================
 
 @router.post(
     "/admin/register",
-    response_model=TokenResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Admin self-registration (requires secret key)",
+    status_code=status.HTTP_410_GONE,
+    summary="[REMOVED] Admin self-registration has been deprecated",
+    include_in_schema=False,  # Hide from Swagger UI
 )
-async def admin_register(
+async def admin_register_deprecated(
     request: Request,
-    body: AdminRegisterRequest,
-    db: AsyncSession = Depends(get_db),
 ):
-    """
-    Only admins can self-register, and only with the correct admin_secret.
-    All other user types (student, staff, other) must be created by admin
-    via the /admin/users/create endpoint.
+    """SEC-002: Public admin self-registration has been permanently removed.
+
+    Admin accounts must be created by an existing administrator via:
+      POST /api/v1/admin/users/create  (requires admin JWT)
+
+    Contact the GRI system administrator for admin account provisioning.
     """
     ip = _client_ip(request)
-
-    # Validate admin secret
-    if body.admin_secret != ADMIN_REGISTER_SECRET:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid admin registration secret.",
-        )
-
-    # Check duplicate email
-    existing = await _get_user_by_email(db, body.email)
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="An account with this email already exists.",
-        )
-
-    # Get admin role
-    role_result = await db.execute(select(Role).where(Role.name == "admin"))
-    admin_role = role_result.scalar_one_or_none()
-    if not admin_role:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Admin role not found. Run schema_auth_extension.sql first.",
-        )
-
-    # Create admin user — immediately approved
-    new_admin = User(
-        email=body.email,
-        password_hash=get_password_hash(body.password),
-        full_name=body.full_name,
-        phone=body.phone,
-        role_id=admin_role.id,
-        is_active=True,
-        is_email_verified=True,
-        approval_status="approved",
+    logger.warning(
+        "[SECURITY] Deprecated /auth/admin/register endpoint accessed. ip=%s", ip
     )
-    db.add(new_admin)
-    await db.flush()  # get new_admin.id
-
-    # Issue tokens
-    token_data = {"sub": str(new_admin.id), "email": new_admin.email, "role": "admin"}
-    access_token = create_access_token(token_data)
-    refresh_token = create_refresh_token(token_data)
-
-    # Store session
-    session = Session(
-        user_id=new_admin.id,
-        refresh_token=refresh_token,
-        ip_address=ip,
-        user_agent=request.headers.get("user-agent", ""),
-        issued_at=datetime.now(timezone.utc),
-        expires_at=datetime.now(timezone.utc)
-        + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
-    )
-    db.add(session)
-
-    await _log_audit(
-        db, actor_id=new_admin.id, action="admin_self_register",
-        target_user_id=new_admin.id, target_email=new_admin.email,
-        ip_address=ip,
-    )
-
-    await db.commit()
-    logger.info("Admin registered: email=%s ip=%s", new_admin.email, ip)
-
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        role="admin",
-        user_id=str(new_admin.id),
-        full_name=new_admin.full_name,
-        email=new_admin.email,
+    raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail=(
+            "Public admin self-registration has been removed for security reasons. "
+            "Admin accounts are provisioned by existing administrators via the admin panel. "
+            "Contact the GRI system administrator."
+        ),
     )
 
 

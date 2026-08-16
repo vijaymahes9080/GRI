@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { Users, Bell, CheckCircle, Clock, ShieldAlert, PlusCircle, ListOrdered, ArrowLeft, Send } from 'lucide-react-native';
 import { apiClient } from '../../core/api';
+import { AdminGuard } from '../../components/AdminGuard';
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
@@ -29,110 +30,133 @@ export default function AdminDashboardScreen() {
     } catch {}
   };
 
+  const [emergencyModalVisible, setEmergencyModalVisible] = useState(false);
+  const [emergencyMessage, setEmergencyMessage] = useState('');
+
   const triggerEmergency = () => {
-    Alert.prompt(
-      '🚨 Trigger Emergency Broadcast',
-      'Enter high-priority alert message for ALL users:',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'BROADCAST NOW',
-          style: 'destructive',
-          onPress: async (msg) => {
-            if (!msg) return;
-            try {
-              await apiClient.post('/notifications/broadcast-emergency', {
-                title: 'Campus Safety Notice',
-                message: msg,
-              });
-              Alert.alert('Broadcast Sent', 'Emergency notification dispatched to all channels.');
-              fetchStats();
-            } catch (err: any) {
-              Alert.alert('Broadcast Error', err?.message || 'Failed to dispatch emergency alert.');
-            }
-          },
-        },
-      ]
-    );
+    setEmergencyMessage('');
+    setEmergencyModalVisible(true);
+  };
+
+  const submitEmergency = async () => {
+    if (!emergencyMessage.trim()) return;
+    setEmergencyModalVisible(false);
+    try {
+      await apiClient.post('/notifications/broadcast-emergency', {
+        title: 'Campus Safety Notice',
+        message: emergencyMessage.trim(),
+      });
+      Alert.alert('Broadcast Sent', 'Emergency notification dispatched to all channels.');
+      fetchStats();
+    } catch (err: any) {
+      Alert.alert('Broadcast Error', err?.message || 'Failed to dispatch emergency alert.');
+    }
   };
 
   return (
-    <View className="flex-1 bg-slate-950">
-      <Stack.Screen options={{ headerShown: false }} />
+    <AdminGuard>
+      <View style={{ flex: 1, backgroundColor: '#020617' }}>
+        <Stack.Screen options={{ headerShown: false }} />
 
-      {/* Header */}
-      <View className="pt-12 pb-4 px-4 bg-slate-900 border-b border-slate-800 flex-row items-center justify-between">
-        <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-slate-800">
-          <ArrowLeft size={20} color="#94a3b8" />
-        </TouchableOpacity>
-        <Text className="text-lg font-bold text-white">GRI Admin Dashboard</Text>
-        <TouchableOpacity onPress={triggerEmergency} className="p-2 rounded-full bg-red-600">
-          <ShieldAlert size={18} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView className="flex-1 p-5">
-        {/* KPI Grid */}
-        <Text className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">System Overview</Text>
-        <View className="flex-row flex-wrap justify-between mb-6">
-          <View className="w-[48%] bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-3">
-            <Users size={22} color="#38bdf8" />
-            <Text className="text-2xl font-black text-white mt-2">{stats.total_users}</Text>
-            <Text className="text-xs text-slate-400 font-medium">Total Registered Users</Text>
+        {/* Emergency Message Modal */}
+        <Modal visible={emergencyModalVisible} transparent animationType="slide">
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 24 }}>
+            <View style={{ backgroundColor: '#1e293b', borderRadius: 16, padding: 24, borderWidth: 1, borderColor: '#7f1d1d' }}>
+              <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>🚨 Emergency Broadcast</Text>
+              <Text style={{ color: '#94a3b8', fontSize: 12, marginBottom: 16 }}>This message will be sent to ALL users across all channels immediately.</Text>
+              <TextInput
+                value={emergencyMessage}
+                onChangeText={setEmergencyMessage}
+                placeholder="Enter emergency alert message..."
+                placeholderTextColor="#475569"
+                multiline
+                numberOfLines={4}
+                style={{ backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#334155', borderRadius: 12, padding: 12, color: '#FFFFFF', fontSize: 14, minHeight: 100 }}
+              />
+              <View style={{ flexDirection: 'row', marginTop: 16, gap: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setEmergencyModalVisible(false)}
+                  style={{ flex: 1, backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#94a3b8', fontWeight: 'bold' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={submitEmergency}
+                  style={{ flex: 1, backgroundColor: '#dc2626', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>BROADCAST</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
+        </Modal>
 
-          <View className="w-[48%] bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-3">
-            <Bell size={22} color="#10b981" />
-            <Text className="text-2xl font-black text-white mt-2">{stats.total_notifications}</Text>
-            <Text className="text-xs text-slate-400 font-medium">Dispatched Alerts</Text>
-          </View>
-
-          <View className="w-[48%] bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-3">
-            <Clock size={22} color="#f59e0b" />
-            <Text className="text-2xl font-black text-white mt-2">{stats.pending_notifications}</Text>
-            <Text className="text-xs text-slate-400 font-medium">Pending Approval</Text>
-          </View>
-
-          <View className="w-[48%] bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-3">
-            <CheckCircle size={22} color="#a855f7" />
-            <Text className="text-2xl font-black text-white mt-2">{stats.delivery_rate_pct}</Text>
-            <Text className="text-xs text-slate-400 font-medium">Delivery Success Rate</Text>
-          </View>
+        {/* Header */}
+        <View style={{ paddingTop: 48, paddingBottom: 16, paddingHorizontal: 16, backgroundColor: '#0f172a', borderBottomWidth: 1, borderBottomColor: '#1e293b', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, borderRadius: 999, backgroundColor: '#1e293b' }}>
+            <ArrowLeft size={20} color="#94a3b8" />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' }}>GRI Admin Dashboard</Text>
+          <TouchableOpacity onPress={triggerEmergency} style={{ padding: 8, borderRadius: 999, backgroundColor: '#dc2626' }}>
+            <ShieldAlert size={18} color="white" />
+          </TouchableOpacity>
         </View>
 
-        {/* Quick Actions */}
-        <Text className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Admin Actions</Text>
+        <ScrollView style={{ flex: 1, padding: 20 }}>
+          {/* KPI Grid */}
+          <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>System Overview</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 }}>
+            {[
+              { icon: Users, color: '#38bdf8', value: stats.total_users, label: 'Total Registered Users' },
+              { icon: Bell, color: '#10b981', value: stats.total_notifications, label: 'Dispatched Alerts' },
+              { icon: Clock, color: '#f59e0b', value: stats.pending_notifications, label: 'Pending Approval' },
+              { icon: CheckCircle, color: '#a855f7', value: stats.delivery_rate_pct, label: 'Delivery Success Rate' },
+            ].map((kpi, i) => {
+              const Icon = kpi.icon;
+              return (
+                <View key={i} style={{ width: '48%', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', padding: 16, borderRadius: 16, marginBottom: 12 }}>
+                  <Icon size={22} color={kpi.color} />
+                  <Text style={{ fontSize: 24, fontWeight: '900', color: '#FFFFFF', marginTop: 8 }}>{kpi.value}</Text>
+                  <Text style={{ fontSize: 12, color: '#64748b', fontWeight: '500' }}>{kpi.label}</Text>
+                </View>
+              );
+            })}
+          </View>
 
-        <TouchableOpacity
-          onPress={() => router.push('/admin/composer')}
-          className="bg-emerald-600 p-4 rounded-2xl flex-row items-center justify-between mb-3 shadow-lg shadow-emerald-900/30"
-        >
-          <View className="flex-row items-center">
-            <PlusCircle size={24} color="white" />
-            <View className="ml-3">
-              <Text className="text-base font-bold text-white">Create Official Notification</Text>
-              <Text className="text-xs text-emerald-100">Composer with target engine & channels</Text>
-            </View>
-          </View>
-          <Send size={20} color="white" />
-        </TouchableOpacity>
+          {/* Quick Actions */}
+          <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Admin Actions</Text>
 
-        <TouchableOpacity
-          onPress={() => router.push('/admin/approval_queue')}
-          className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex-row items-center justify-between mb-3"
-        >
-          <View className="flex-row items-center">
-            <ListOrdered size={24} color="#f59e0b" />
-            <View className="ml-3">
-              <Text className="text-base font-bold text-white">Approval Queue</Text>
-              <Text className="text-xs text-slate-400">{stats.pending_notifications} pending admin review</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/admin/composer')}
+            style={{ backgroundColor: '#059669', padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <PlusCircle size={24} color="white" />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#FFFFFF' }}>Create Official Notification</Text>
+                <Text style={{ fontSize: 12, color: '#a7f3d0' }}>Composer with target engine & channels</Text>
+              </View>
             </View>
-          </View>
-          <View className="bg-amber-500/20 px-3 py-1 rounded-full">
-            <Text className="text-xs font-bold text-amber-400">Review</Text>
-          </View>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+            <Send size={20} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/admin/approval_queue')}
+            style={{ backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <ListOrdered size={24} color="#f59e0b" />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#FFFFFF' }}>Approval Queue</Text>
+                <Text style={{ fontSize: 12, color: '#64748b' }}>{stats.pending_notifications} pending admin review</Text>
+              </View>
+            </View>
+            <View style={{ backgroundColor: 'rgba(245,158,11,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 999 }}>
+              <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#fbbf24' }}>Review</Text>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </AdminGuard>
   );
 }

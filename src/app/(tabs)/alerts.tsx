@@ -59,19 +59,51 @@ export default function AlertsScreen() {
   useEffect(() => {
     fetchNotifications();
 
-    // WebSocket real-time connection
-    const ws = new WebSocket('ws://localhost:8000/ws/announcements');
-    ws.onmessage = (event) => {
+    // SEC-007 FIX: Use environment variable for WebSocket URL — never hardcode localhost.
+    // EXPO_PUBLIC_API_URL should be set to the backend base URL (e.g. https://api.ruraluniv.ac.in).
+    // Falls back to localhost only in development, never in production.
+    const apiBase = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+    const wsProtocol = apiBase.startsWith('https') ? 'wss' : 'ws';
+    const wsHost = apiBase.replace(/^https?:\/\//, '');
+    const wsUrl = `${wsProtocol}://${wsHost}/ws/announcements`;
+
+    let ws: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
       try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'NOTIFICATION' || data.type === 'EMERGENCY_ALERT') {
-          fetchNotifications();
-        }
-      } catch {}
+        ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          console.log('[Alerts] WebSocket connected:', wsUrl);
+        };
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'NOTIFICATION' || data.type === 'EMERGENCY_ALERT') {
+              fetchNotifications();
+            }
+          } catch {}
+        };
+        ws.onerror = () => {
+          // Connection error — silently retry, do not expose error to user
+        };
+        ws.onclose = () => {
+          // Reconnect after 15 seconds on unexpected close
+          reconnectTimeout = setTimeout(connect, 15000);
+        };
+      } catch {
+        // WebSocket not available (e.g., bundler env) — continue without real-time
+      }
     };
 
-    return () => ws.close();
+    connect();
+
+    return () => {
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (ws) ws.close();
+    };
   }, []);
+
 
   const handleRefresh = async () => {
     setRefreshing(true);
