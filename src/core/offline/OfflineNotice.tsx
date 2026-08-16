@@ -9,23 +9,7 @@ export function OfflineNotice() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccessMsg, setSyncSuccessMsg] = useState<string | null>(null);
 
-  const checkConnectivity = async () => {
-    try {
-      // Ping health endpoint to verify internet / backend connectivity
-      const response = await apiClient.get('/health', { timeout: 4000 });
-      if (response.status === 200) {
-        if (isOffline) {
-          // Came back online — process pending sync queue
-          setIsOffline(false);
-          triggerSyncQueue();
-        }
-      }
-    } catch {
-      setIsOffline(true);
-    }
-  };
-
-  const triggerSyncQueue = async () => {
+  const triggerSyncQueue = React.useCallback(async () => {
     setIsSyncing(true);
     try {
       const res = await processOfflineSyncQueue();
@@ -38,13 +22,28 @@ export function OfflineNotice() {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, []);
+
+  const checkConnectivity = React.useCallback(async () => {
+    try {
+      const response = await apiClient.get('/health', { timeout: 4000 });
+      if (response.status === 200) {
+        setIsOffline((prev) => {
+          if (prev) {
+            triggerSyncQueue();
+          }
+          return false;
+        });
+      }
+    } catch {
+      setIsOffline(true);
+    }
+  }, [triggerSyncQueue]);
 
   useEffect(() => {
-    checkConnectivity();
-    const interval = setInterval(checkConnectivity, 10000); // Check every 10 seconds
+    const interval = setInterval(checkConnectivity, 10000);
     return () => clearInterval(interval);
-  }, [isOffline]);
+  }, [checkConnectivity]);
 
   if (syncSuccessMsg) {
     return (

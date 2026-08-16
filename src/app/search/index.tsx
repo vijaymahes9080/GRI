@@ -8,24 +8,19 @@
  * Uses navigationResolver for safe routing.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  Search,
   BookOpen,
-  User,
   Building2,
-  FileText,
   Layers,
-  ChevronRight,
 } from 'lucide-react-native';
 
 import {
@@ -39,7 +34,6 @@ import {
   radii,
   typography,
   iconSizes,
-  shadows,
 } from '../../components/ui';
 import { navigationResolver, DISCOVER_TREE, SERVICE_ITEMS } from '../../navigation';
 import { useAuthStore } from '../../core/auth/authStore';
@@ -62,20 +56,12 @@ export default function GlobalSearchScreen() {
 
   const [query, setQuery] = useState(q || '');
   const [selectedCategory, setSelectedCategory] = useState<SearchCategory>('ALL');
-  const [results, setResults] = useState<SearchResultItem[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    performSearch();
-  }, [query, selectedCategory]);
-
-  const performSearch = () => {
+  const results = useMemo(() => {
     if (!query.trim()) {
-      setResults([]);
-      return;
+      return [];
     }
 
-    setLoading(true);
     const searchTerm = query.toLowerCase();
     const searchResults: SearchResultItem[] = [];
 
@@ -121,15 +107,10 @@ export default function GlobalSearchScreen() {
       }
     }
 
-    // Filter by active category tab
-    const filtered =
-      selectedCategory === 'ALL'
-        ? searchResults
-        : searchResults.filter((r) => r.category === selectedCategory);
-
-    setResults(filtered);
-    setLoading(false);
-  };
+    return selectedCategory === 'ALL'
+      ? searchResults
+      : searchResults.filter((r) => r.category === selectedCategory);
+  }, [query, selectedCategory]);
 
   const handleSelectResult = (item: SearchResultItem) => {
     navigationResolver.navigate(router, item.route, user?.role);
@@ -176,11 +157,7 @@ export default function GlobalSearchScreen() {
         </View>
 
         {/* Results List */}
-        {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color={colors.primary} />
-          </View>
-        ) : results.length > 0 ? (
+        {results.length > 0 ? (
           <FlatList
             data={results}
             keyExtractor={(item) => item.id}

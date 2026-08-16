@@ -23,9 +23,15 @@ function GlobalAuthGuard({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const rootSegment = segments[0];
-    const isPublicRoute = rootSegment === 'auth' || rootSegment === 'index' || segments.length === 0;
+    const isPublicRoute =
+      rootSegment === 'auth' ||
+      rootSegment === 'index' ||
+      rootSegment === 'content' ||
+      rootSegment === 'search' ||
+      segments.length === 0;
 
-    if (!isAuthenticated && !isPublicRoute) {
+    // Protected sections require authentication
+    if (!isAuthenticated && !isPublicRoute && rootSegment !== '(tabs)') {
       router.replace('/auth/login');
     }
   }, [isAuthenticated, segments]);
