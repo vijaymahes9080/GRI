@@ -1,36 +1,41 @@
-import React, { useEffect } from 'react';
-import { Tabs, useRouter } from 'expo-router';
+/**
+ * GRI Top-Level Bottom Tab Navigation Layout
+ *
+ * Requirements Section 3, 4, 14:
+ * - Exactly 5 bottom tabs: Home, Discover, Services, Alerts, Profile.
+ * - Dynamic bottom inset using useSafeAreaInsets() so tab bar never overlaps Android gesture nav bar.
+ * - Non-tab destinations hidden with href: null.
+ */
+
+import React from 'react';
+import { Tabs } from 'expo-router';
 import { Home, Compass, Layers, Bell, User } from 'lucide-react-native';
-import { useAppConfig } from '../../core/config/useAppConfig';
-import { useAuthStore } from '../../core/auth/authStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, fontWeights } from '../../components/ui/tokens';
 
 export default function TabsLayout() {
-  const router = useRouter();
-  const { theme } = useAppConfig();
-  const { isAuthenticated } = useAuthStore();
+  const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/auth/login');
-    }
-  }, [isAuthenticated]);
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 8;
+  const tabHeight = 56 + bottomInset;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme?.primaryColor || '#518214',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textTertiary,
         tabBarStyle: {
-          backgroundColor: theme?.surfaceColor || '#FFFFFF',
-          borderTopColor: '#E5E7EB',
-          height: 62,
-          paddingBottom: 8,
+          backgroundColor: colors.white,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          height: tabHeight,
+          paddingBottom: bottomInset,
           paddingTop: 6,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: fontWeights.semibold,
         },
       }}
     >
@@ -44,7 +49,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="discover"
         options={{
-          title: 'Explore',
+          title: 'Discover',
           tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
         }}
       />
@@ -69,37 +74,12 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="academics"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="ai_chat"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="examinations"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="hostel"
-        options={{
-          href: null,
-        }}
-      />
+      {/* Hidden non-tab routes */}
+      <Tabs.Screen name="academics" options={{ href: null }} />
+      <Tabs.Screen name="ai_chat" options={{ href: null }} />
+      <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen name="examinations" options={{ href: null }} />
+      <Tabs.Screen name="hostel" options={{ href: null }} />
     </Tabs>
   );
 }
-

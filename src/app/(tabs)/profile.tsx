@@ -1,165 +1,447 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { User, ShieldCheck, Bell, Lock, HelpCircle, LogOut, ChevronRight } from 'lucide-react-native';
+/**
+ * GRI Mobile Application — Profile Workspace Screen
+ *
+ * Requirements Section 7:
+ * Personalized secure workspace with clear separation:
+ * - Anonymous: Login, Register, Help
+ * - Authenticated: My Profile, My Role, Academic Info, My Services, Settings, Security, Admin Panel (if admin), Logout.
+ */
 
-import { Header } from '../../components/Header';
-import { Card } from '../../components/Card';
-import { useAuthStore, UserRole } from '../../core/auth/authStore';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import {
+  User,
+  Shield,
+  BookOpen,
+  FileText,
+  Bell,
+  Settings,
+  LogOut,
+  LogIn,
+  UserPlus,
+  HelpCircle,
+  ChevronRight,
+  ShieldCheck,
+  Building,
+  Key,
+  X,
+} from 'lucide-react-native';
+
+import {
+  Screen,
+  ScreenHeader,
+  ListItem,
+  SectionHeader,
+  Badge,
+  colors,
+  spacing,
+  radii,
+  typography,
+  iconSizes,
+  shadows,
+} from '../../components/ui';
+import { useAuthStore } from '../../core/auth/authStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout, updateUser } = useAuthStore();
-  const [showRoleModal, setShowRoleModal] = React.useState(false);
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out of GRI Portal?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          router.replace('/auth/login');
+    Alert.alert(
+      'Logout Confirmation',
+      'Are you sure you want to log out of your GRI account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Log Out',
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/auth/login');
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
-  const allRoles: { role: UserRole; title: string; desc: string }[] = [
-    { role: 'STUDENT', title: 'Student', desc: 'Attendance, Grades, Fees & Hall Ticket' },
-    { role: 'FACULTY', title: 'Faculty', desc: 'Class Attendance, CFA Marks & Roster' },
-    { role: 'RESEARCH_SCHOLAR', title: 'Research Scholar', desc: 'Ph.D. Progress, Thesis & Fellowship' },
-    { role: 'DEPARTMENT_ADMIN', title: 'Department Admin', desc: 'Departmental Notices & Timetables' },
-    { role: 'EXAM_STAFF', title: 'Exam Staff', desc: 'Seating, Exam Schedules & Revaluation' },
-    { role: 'HOSTEL_STAFF', title: 'Hostel Warden', desc: 'Outpass Approvals & Mess Fees' },
-    { role: 'FINANCE_STAFF', title: 'Finance Staff', desc: 'Fee Ledger & Payment Receipts' },
-    { role: 'UNIVERSITY_ADMIN', title: 'University Admin', desc: 'University Dashboard & Content CMS' },
-    { role: 'LIBRARIAN', title: 'Librarian', desc: 'OPAC Search & Book Transactions' },
-    { role: 'PLACEMENT_OFFICER', title: 'Placement Officer', desc: 'Campus Drives & Interviews' },
-    { role: 'ALUMNI', title: 'Alumni', desc: 'Networking, Events & Mentorship' },
-    { role: 'PENSIONER', title: 'Pensioner', desc: 'Life Certificate & Pension Status' },
-    { role: 'SYSTEM_ADMIN', title: 'System Admin', desc: 'RBAC Permissions & Audit Logs' },
-  ];
-
-  const [showPreferences, setShowPreferences] = React.useState(false);
-  const [preferences, setPreferences] = React.useState({
-    push: true,
-    email: true,
-    whatsapp: true,
-    sms: true,
-    emergency: true,
-  });
-
-  const menuItems = [
-    { title: 'View Assigned Role & RBAC Scope', icon: ShieldCheck, action: () => setShowRoleModal(true) },
-    { title: 'Security & Biometrics', icon: Lock, action: () => Alert.alert('Biometrics', 'Fingerprint & Hardware Keystore enabled') },
-    { title: 'Notification Preferences (Push/Email/WhatsApp/SMS)', icon: Bell, action: () => setShowPreferences(!showPreferences) },
-    { title: 'Help & Grievance Portal', icon: HelpCircle, action: () => router.push('/(tabs)/services' as any) },
-  ];
+  const isAdmin =
+    user?.role === 'ADMIN' ||
+    user?.role === 'SYSTEM_ADMIN' ||
+    user?.role === 'DEPARTMENT_ADMIN';
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <Header title="My Profile" subtitle="GRI Unified Identity & Settings" variant="green" />
+    <Screen variant="scroll" backgroundColor={colors.surfaceElevated}>
+      <ScreenHeader
+        title="Personal Workspace"
+        subtitle={isAuthenticated ? user?.fullName : 'Guest Visitor'}
+        variant="primary"
+      />
 
-      <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        {/* User Card */}
-        <Card className="p-5 mb-5 border-gray-200 bg-white flex-row items-center shadow-sm">
-          <View className="bg-[#518214] p-4 rounded-full mr-4">
-            <User size={32} color="#FFFFFF" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-lg font-bold text-gray-900">{user?.fullName || 'Authenticated User'}</Text>
-            <View className="bg-[#911C03] px-2.5 py-0.5 rounded-full align-self-start mt-1 mb-1">
-              <Text className="text-[10px] font-bold text-white uppercase">{user?.role || 'STUDENT'}</Text>
+      <View style={styles.content}>
+        {/* User Identity Card */}
+        {isAuthenticated && user ? (
+          <View style={styles.userCard}>
+            <View style={styles.avatar}>
+              <User size={iconSizes.xl} color={colors.primary} />
             </View>
-            <Text className="text-xs text-gray-500 font-medium">{user?.department || 'Gandhigram Rural Institute'}</Text>
-            <Text className="text-xs font-semibold text-[#518214] mt-0.5">ID: {user?.rollNumber || 'GRI-2026'}</Text>
-          </View>
-        </Card>
-
-        {/* Menu Items */}
-        <Text className="text-lg font-bold text-gray-900 mb-3">Settings & Options</Text>
-
-        {menuItems.map((item, idx) => {
-          const Icon = item.icon;
-          return (
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user.fullName}</Text>
+              <Text style={styles.userEmail}>{user.email}</Text>
+              <View style={styles.roleBadgeRow}>
+                <Badge label={user.role} variant="primary" size="sm" />
+                {user.department ? (
+                  <Text style={styles.userDept} numberOfLines={1}>
+                    {user.department}
+                  </Text>
+                ) : null}
+              </View>
+            </View>
             <TouchableOpacity
-              key={idx}
-              onPress={item.action}
-              className="bg-white p-4 rounded-2xl border border-gray-200 mb-3 flex-row items-center justify-between shadow-sm"
-              activeOpacity={0.7}
+              onPress={() => setShowRoleModal(true)}
+              style={styles.infoIconButton}
+              accessibilityLabel="View Role Permissions"
             >
-              <View className="flex-row items-center">
-                <View className="bg-emerald-50 p-2.5 rounded-xl mr-3">
-                  <Icon size={20} color="#518214" />
-                </View>
-                <Text className="text-base font-semibold text-gray-800">{item.title}</Text>
-              </View>
-              <ChevronRight size={18} color="#9CA3AF" />
+              <ShieldCheck size={iconSizes.md} color={colors.primary} />
             </TouchableOpacity>
-          );
-        })}
-
-        {/* Logout Button */}
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="bg-red-50 border border-red-200 p-4 rounded-2xl mt-4 flex-row items-center justify-center shadow-sm"
-          activeOpacity={0.7}
-        >
-          <LogOut size={20} color="#D32F2F" />
-          <Text className="text-base font-bold text-red-600 ml-2">Sign Out of GRI Portal</Text>
-        </TouchableOpacity>
-
-        <View className="h-8" />
-      </ScrollView>
-
-      {/* Read-Only RBAC Scope Security Audit Modal */}
-      <React.Fragment>
-        {showRoleModal && (
-          <View className="absolute inset-0 bg-black/60 items-center justify-center p-5 z-50">
-            <View className="bg-white w-full max-w-md rounded-3xl p-5 max-h-[80%]">
-              <Text className="text-xl font-bold text-gray-900 mb-1 text-center">Authenticated RBAC Scope</Text>
-              <Text className="text-xs text-gray-500 mb-4 text-center">
-                Verified identity permissions signed by GRI PostgreSQL Auth Server
-              </Text>
-
-              <View className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl mb-4">
-                <Text className="text-xs font-bold text-emerald-800 uppercase mb-1">Active Institutional Role</Text>
-                <Text className="text-lg font-extrabold text-[#518214]">{user?.role || 'STUDENT'}</Text>
-                <Text className="text-xs text-gray-600 mt-1">
-                  User ID: {user?.id || 'Verified'}
-                </Text>
-                <Text className="text-xs text-gray-600">
-                  Email: {user?.email || 'Verified'}
-                </Text>
-              </View>
-
-              <Text className="text-xs font-bold text-gray-700 uppercase mb-2">Role Access Control Details</Text>
-              <ScrollView className="gap-2 mb-4" showsVerticalScrollIndicator={false}>
-                {allRoles
-                  .filter((r) => r.role === user?.role)
-                  .map((r, i) => (
-                    <View key={i} className="p-3.5 rounded-xl border bg-emerald-50 border-[#518214] mb-2 flex-row items-center justify-between">
-                      <View className="flex-1 pr-2">
-                        <Text className="text-sm font-bold text-gray-900">{r.title}</Text>
-                        <Text className="text-xs text-gray-600 mt-0.5">{r.desc}</Text>
-                      </View>
-                      <ShieldCheck size={22} color="#518214" />
-                    </View>
-                  ))}
-              </ScrollView>
-
+          </View>
+        ) : (
+          /* Anonymous Banner */
+          <View style={styles.anonCard}>
+            <Text style={styles.anonTitle}>Guest Experience</Text>
+            <Text style={styles.anonSub}>
+              Sign in to access your personalized student timetable, grade sheets, hostel passes, and official notifications.
+            </Text>
+            <View style={styles.anonActionRow}>
               <TouchableOpacity
-                onPress={() => setShowRoleModal(false)}
-                className="bg-gray-200 p-3.5 rounded-xl items-center"
+                onPress={() => router.push('/auth/login')}
+                style={styles.loginBtn}
               >
-                <Text className="text-sm font-bold text-gray-800">Close</Text>
+                <LogIn size={iconSizes.sm} color={colors.white} style={{ marginRight: 6 }} />
+                <Text style={styles.loginBtnText}>Sign In</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/auth/register')}
+                style={styles.registerBtn}
+              >
+                <UserPlus size={iconSizes.sm} color={colors.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.registerBtnText}>Register</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
-      </React.Fragment>
-    </View>
+
+        {/* Authenticated Workspace Menu */}
+        {isAuthenticated ? (
+          <>
+            <SectionHeader title="Academic & Personal Services" />
+            <View style={styles.menuGroup}>
+              <ListItem
+                title="My Academic Profile"
+                subtitle="Enrolment, Department & Programme Details"
+                leftIcon={<BookOpen size={iconSizes.md} color={colors.primary} />}
+                onPress={() => router.push('/content/academics/overview')}
+                showSeparator
+              />
+              <ListItem
+                title="My Documents & Vault"
+                subtitle="Hall Tickets, Transcripts & Certificates"
+                leftIcon={<FileText size={iconSizes.md} color={colors.info} />}
+                onPress={() => router.push('/services/document-vault' as any)}
+                showSeparator
+              />
+              <ListItem
+                title="My Notification History"
+                subtitle="Archived Official Notices & Circulars"
+                leftIcon={<Bell size={iconSizes.md} color={colors.accent} />}
+                onPress={() => router.push('/(tabs)/alerts')}
+              />
+            </View>
+
+            {/* Admin Panel Entry Point (Only exposed if role is Admin, Requirement 7) */}
+            {isAdmin ? (
+              <>
+                <SectionHeader title="Administrative Operations" />
+                <View style={styles.menuGroup}>
+                  <ListItem
+                    title="GRI Administration Dashboard"
+                    subtitle="Notification Composer, Approval Queue & User Management"
+                    leftIcon={<Shield size={iconSizes.md} color={colors.secondary} />}
+                    onPress={() => router.push('/admin/dashboard')}
+                    rightElement={
+                      <Badge label="ADMIN" variant="secondary" size="sm" />
+                    }
+                  />
+                </View>
+              </>
+            ) : null}
+
+            <SectionHeader title="Security & Settings" />
+            <View style={styles.menuGroup}>
+              <ListItem
+                title="Account Security & MFA"
+                subtitle="Hardware Keystore, Biometric & Session Management"
+                leftIcon={<Key size={iconSizes.md} color={colors.success} />}
+                onPress={() => Alert.alert('Security', 'Your session is encrypted with hardware keystore security.')}
+                showSeparator
+              />
+              <ListItem
+                title="Help & Support"
+                subtitle="University Helpdesk & Contact Directory"
+                leftIcon={<HelpCircle size={iconSizes.md} color={colors.warning} />}
+                onPress={() => router.push('/content/contact' as any)}
+              />
+            </View>
+
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.logoutButton}
+              activeOpacity={0.8}
+            >
+              <LogOut size={iconSizes.md} color={colors.error} style={{ marginRight: spacing[2] }} />
+              <Text style={styles.logoutText}>Sign Out of Workspace</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          /* Anonymous Help Section */
+          <>
+            <SectionHeader title="Help & Information" />
+            <View style={styles.menuGroup}>
+              <ListItem
+                title="About GRI Mobile Portal"
+                subtitle="Deemed to be University Overview"
+                leftIcon={<Building size={iconSizes.md} color={colors.primary} />}
+                onPress={() => router.push('/content/about/overview')}
+                showSeparator
+              />
+              <ListItem
+                title="Contact University Helpdesk"
+                subtitle="Registrar & Administrative Enquiries"
+                leftIcon={<HelpCircle size={iconSizes.md} color={colors.info} />}
+                onPress={() => router.push('/content/contact' as any)}
+              />
+            </View>
+          </>
+        )}
+
+        <View style={{ height: spacing.xl }} />
+      </View>
+
+      {/* Role & Permissions Modal (Fixed ALIGN-009: uses RN Modal instead of absolute inset) */}
+      <Modal visible={showRoleModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Role Capabilities</Text>
+              <TouchableOpacity onPress={() => setShowRoleModal(false)}>
+                <X size={iconSizes.md} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalRoleName}>Assigned Role: {user?.role}</Text>
+            <Text style={styles.modalRoleSub}>
+              Permissions are securely validated on the server for all requests.
+            </Text>
+
+            <View style={styles.permList}>
+              {['Academic Profile Access', 'Exam Hall Ticket Download', 'Hostel Leave Submission', 'Grievance Filing'].map((perm, i) => (
+                <View key={i} style={styles.permRow}>
+                  <ShieldCheck size={iconSizes.sm} color={colors.primary} />
+                  <Text style={styles.permText}>{perm}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: spacing.screenPaddingH,
+    paddingTop: spacing.sm,
+  },
+  userCard: {
+    backgroundColor: colors.white,
+    borderRadius: radii.card,
+    padding: spacing.cardPadding,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.primarySurface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    ...typography.titleSm,
+    color: colors.textPrimary,
+  },
+  userEmail: {
+    ...typography.captionSm,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
+  roleBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    gap: 6,
+  },
+  userDept: {
+    ...typography.captionSm,
+    color: colors.textTertiary,
+    flex: 1,
+  },
+  infoIconButton: {
+    padding: spacing[2],
+  },
+
+  // Anonymous card
+  anonCard: {
+    backgroundColor: colors.white,
+    borderRadius: radii.card,
+    padding: spacing.cardPadding,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  anonTitle: {
+    ...typography.titleSm,
+    color: colors.textPrimary,
+    marginBottom: 4,
+  },
+  anonSub: {
+    ...typography.bodySm,
+    color: colors.textSecondary,
+    lineHeight: 20,
+    marginBottom: spacing.md,
+  },
+  anonActionRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  loginBtn: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing[3],
+    borderRadius: radii.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginBtnText: {
+    ...typography.button,
+    color: colors.white,
+  },
+  registerBtn: {
+    flex: 1,
+    backgroundColor: colors.primarySurface,
+    borderWidth: 1,
+    borderColor: colors.primaryBorder,
+    paddingVertical: spacing[3],
+    borderRadius: radii.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  registerBtnText: {
+    ...typography.button,
+    color: colors.primary,
+  },
+
+  // Menu group
+  menuGroup: {
+    backgroundColor: colors.white,
+    borderRadius: radii.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+    marginBottom: spacing.sm,
+    ...shadows.sm,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.errorLight,
+    paddingVertical: spacing[3.5],
+    borderRadius: radii.button,
+    marginTop: spacing.md,
+  },
+  logoutText: {
+    ...typography.button,
+    color: colors.error,
+  },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: colors.overlay60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  modalCard: {
+    backgroundColor: colors.white,
+    width: '100%',
+    maxWidth: 320,
+    borderRadius: radii.modal,
+    padding: spacing.lg,
+    ...shadows.lg,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  modalTitle: {
+    ...typography.titleSm,
+    color: colors.textPrimary,
+  },
+  modalRoleName: {
+    ...typography.label,
+    color: colors.primaryDark,
+    marginTop: spacing[1],
+  },
+  modalRoleSub: {
+    ...typography.captionSm,
+    color: colors.textSecondary,
+    marginTop: 2,
+    marginBottom: spacing.md,
+  },
+  permList: {
+    gap: spacing[2],
+  },
+  permRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  permText: {
+    ...typography.bodySm,
+    color: colors.textPrimary,
+    marginLeft: spacing[2],
+  },
+});

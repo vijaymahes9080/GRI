@@ -1,77 +1,253 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { ChevronLeft, Search, ChevronRight, BookOpen, Shield, Users, GraduationCap, FileText, MapPin } from 'lucide-react-native';
+/**
+ * GRI Centralized Global Search Screen
+ *
+ * Requirements Section 8:
+ * Search across university info, departments, programmes, faculty, notices,
+ * examinations, admissions, research, facilities, services, and documents.
+ * Categorized results: All, People, Departments, Academics, Notices, Services, Documents.
+ * Uses navigationResolver for safe routing.
+ */
+
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  Search,
+  BookOpen,
+  User,
+  Building2,
+  FileText,
+  Layers,
+  ChevronRight,
+} from 'lucide-react-native';
+
+import {
+  Screen,
+  ScreenHeader,
+  SearchBar,
+  ListItem,
+  NoResultsState,
+  colors,
+  spacing,
+  radii,
+  typography,
+  iconSizes,
+  shadows,
+} from '../../components/ui';
+import { navigationResolver, DISCOVER_TREE, SERVICE_ITEMS } from '../../navigation';
+import { useAuthStore } from '../../core/auth/authStore';
+
+type SearchCategory = 'ALL' | 'DEPARTMENTS' | 'ACADEMICS' | 'NOTICES' | 'SERVICES';
+
+interface SearchResultItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: SearchCategory;
+  route: string;
+  icon: any;
+}
 
 export default function GlobalSearchScreen() {
   const router = useRouter();
-  const [query, setQuery] = useState('');
+  const { user } = useAuthStore();
+  const { q } = useLocalSearchParams<{ q: string }>();
 
-  const searchResults = [
-    { title: 'Department of Computer Science & Applications', category: 'Academics', route: '/academics/department_detail?deptId=cs', icon: BookOpen, color: '#518214' },
-    { title: 'Department of Agriculture', category: 'Academics', route: '/academics/department_detail?deptId=agri', icon: BookOpen, color: '#518214' },
-    { title: 'Board of Management (Executive Council)', category: 'Governance', route: '/governance', icon: Shield, color: '#911C03' },
-    { title: 'Controller of Examinations (CoE)', category: 'Administration', route: '/administration', icon: Users, color: '#0D47A1' },
-    { title: 'Admissions Prospectus 2026-2027', category: 'Admissions', route: '/admissions', icon: GraduationCap, color: '#6A1B9A' },
-    { title: 'ESE Examination Timetable Query', category: 'Examinations', route: '/examination/timetable', icon: FileText, color: '#00838F' },
-    { title: 'Online Ph.D. Status Tracking', category: 'Examinations', route: '/examination/phd_tracking', icon: FileText, color: '#00838F' },
-    { title: 'e-SANAD Document Verification', category: 'Services', route: '/examination/esanad', icon: FileText, color: '#2E7D32' },
-  ].filter((item) => item.title.toLowerCase().includes(query.toLowerCase()) || item.category.toLowerCase().includes(query.toLowerCase()));
+  const [query, setQuery] = useState(q || '');
+  const [selectedCategory, setSelectedCategory] = useState<SearchCategory>('ALL');
+  const [results, setResults] = useState<SearchResultItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    performSearch();
+  }, [query, selectedCategory]);
+
+  const performSearch = () => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    const searchTerm = query.toLowerCase();
+    const searchResults: SearchResultItem[] = [];
+
+    // Search DISCOVER_TREE
+    for (const cat of DISCOVER_TREE) {
+      if (cat.title.toLowerCase().includes(searchTerm) || cat.subtitle?.toLowerCase().includes(searchTerm)) {
+        searchResults.push({
+          id: cat.id,
+          title: cat.title,
+          subtitle: cat.subtitle || 'Institutional Category',
+          category: 'DEPARTMENTS',
+          route: cat.route,
+          icon: Building2,
+        });
+      }
+      if (cat.children) {
+        for (const child of cat.children) {
+          if (child.title.toLowerCase().includes(searchTerm) || child.subtitle?.toLowerCase().includes(searchTerm)) {
+            searchResults.push({
+              id: child.id,
+              title: child.title,
+              subtitle: `${cat.title} · ${child.subtitle || 'Sub-section'}`,
+              category: 'ACADEMICS',
+              route: child.route,
+              icon: BookOpen,
+            });
+          }
+        }
+      }
+    }
+
+    // Search SERVICES
+    for (const svc of SERVICE_ITEMS) {
+      if (svc.title.toLowerCase().includes(searchTerm) || svc.subtitle?.toLowerCase().includes(searchTerm)) {
+        searchResults.push({
+          id: svc.id,
+          title: svc.title,
+          subtitle: svc.subtitle || 'University Portal Action',
+          category: 'SERVICES',
+          route: svc.route,
+          icon: Layers,
+        });
+      }
+    }
+
+    // Filter by active category tab
+    const filtered =
+      selectedCategory === 'ALL'
+        ? searchResults
+        : searchResults.filter((r) => r.category === selectedCategory);
+
+    setResults(filtered);
+    setLoading(false);
+  };
+
+  const handleSelectResult = (item: SearchResultItem) => {
+    navigationResolver.navigate(router, item.route, user?.role);
+  };
+
+  const categories: { key: SearchCategory; label: string }[] = [
+    { key: 'ALL', label: 'All Results' },
+    { key: 'DEPARTMENTS', label: 'Departments' },
+    { key: 'ACADEMICS', label: 'Academics' },
+    { key: 'SERVICES', label: 'Services' },
+  ];
 
   return (
-    <View className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="bg-[#518214] pt-12 pb-5 px-4 rounded-b-3xl shadow-md">
-        <View className="flex-row items-center mb-3">
-          <TouchableOpacity onPress={() => router.back()} className="p-2 bg-white/20 rounded-full mr-3">
-            <ChevronLeft size={20} color="#FFFFFF" />
-          </TouchableOpacity>
-          <View>
-            <Text className="text-xl font-bold text-white">Global University Search</Text>
-            <Text className="text-xs text-emerald-100 font-medium">Search 220+ courses, departments, rules & portals</Text>
-          </View>
-        </View>
+    <Screen variant="static" backgroundColor={colors.surfaceElevated}>
+      <ScreenHeader title="Global Search" showBack variant="primary" />
 
-        {/* Input */}
-        <View className="flex-row items-center bg-white rounded-2xl px-3.5 py-2.5 shadow-sm mt-1">
-          <Search size={20} color="#6B7280" />
-          <TextInput
-            placeholder="Type course, department, fee, exam..."
+      <View style={styles.container}>
+        {/* Search Input */}
+        <View style={styles.searchBarWrapper}>
+          <SearchBar
             value={query}
             onChangeText={setQuery}
+            placeholder="Search departments, programmes, services..."
             autoFocus
-            className="flex-1 ml-2.5 text-sm text-gray-900 font-medium"
-            placeholderTextColor="#9CA3AF"
           />
         </View>
+
+        {/* Category Tabs */}
+        <View style={styles.tabsRow}>
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.key;
+            return (
+              <TouchableOpacity
+                key={cat.key}
+                onPress={() => setSelectedCategory(cat.key)}
+                style={[styles.tabChip, isSelected && styles.activeTabChip]}
+              >
+                <Text style={[styles.tabLabel, isSelected && styles.activeTabLabel]}>
+                  {cat.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Results List */}
+        {loading ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : results.length > 0 ? (
+          <FlatList
+            data={results}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            renderItem={({ item }) => {
+              const IconComponent = item.icon;
+              return (
+                <ListItem
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  leftIcon={<IconComponent size={iconSizes.md} color={colors.primary} />}
+                  onPress={() => handleSelectResult(item)}
+                  showSeparator
+                />
+              );
+            }}
+          />
+        ) : (
+          <NoResultsState query={query} onClear={() => setQuery('')} />
+        )}
       </View>
-
-      <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        <Text className="text-xs font-bold text-gray-700 uppercase mb-3">Search Matches ({searchResults.length})</Text>
-
-        {searchResults.map((item, idx) => {
-          const IconComp = item.icon;
-          return (
-            <TouchableOpacity
-              key={idx}
-              onPress={() => router.push(item.route as any)}
-              className="bg-white p-4 rounded-2xl border border-gray-200 mb-3 shadow-sm flex-row items-center justify-between"
-            >
-              <View className="flex-row items-center flex-1 pr-2">
-                <View className="p-2.5 rounded-xl mr-3" style={{ backgroundColor: `${item.color}15` }}>
-                  <IconComp size={20} color={item.color} />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-xs font-bold uppercase mb-0.5" style={{ color: item.color }}>{item.category}</Text>
-                  <Text className="text-sm font-bold text-gray-900">{item.title}</Text>
-                </View>
-              </View>
-              <ChevronRight size={18} color="#9CA3AF" />
-            </TouchableOpacity>
-          );
-        })}
-        <View className="h-10" />
-      </ScrollView>
-    </View>
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  searchBarWrapper: {
+    paddingHorizontal: spacing.screenPaddingH,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xs,
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.screenPaddingH,
+    paddingVertical: spacing.xs,
+    gap: spacing.xs,
+  },
+  tabChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing[1.5],
+    borderRadius: radii.chip,
+    backgroundColor: colors.surfaceSubtle,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  activeTabChip: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  tabLabel: {
+    ...typography.captionSm,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  activeTabLabel: {
+    color: colors.white,
+  },
+  listContent: {
+    paddingHorizontal: spacing.screenPaddingH,
+    paddingVertical: spacing.sm,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

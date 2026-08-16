@@ -34,14 +34,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-      setPassword('Admin@GRI2026');
-    } else {
-      setEmail('faculty@test.edu');
-      setPassword('FacultyPass#123');
-    }
-  };
-
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       setErrorMsg('Please enter your Email and Password.');
