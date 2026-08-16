@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { useAuthStore } from '../core/auth/authStore';
+import { OfflineNotice } from '../core/offline/OfflineNotice';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ErrorBoundary fallbackTitle="GRI University Service Recovered">
           <GlobalAuthGuard>
+            <OfflineNotice />
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="index" />
               <Stack.Screen name="auth" />

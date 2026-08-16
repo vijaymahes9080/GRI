@@ -134,6 +134,10 @@ Every transition is recorded in `core.audit_log` with actor ID, timestamp, and m
 - **Alerts Inbox** ([`src/app/(tabs)/alerts.tsx`](file:///d:/current%20project/GRI/src/app/(tabs)/alerts.tsx)): Real-time WebSockets connection, unread badge counter, tab filters (`All`, `Unread`, `Circulars`, `Events`), pull-to-refresh, MMKV offline caching.
 - **Notification Detail** ([`src/app/notifications/[id].tsx`](file:///d:/current%20project/GRI/src/app/notifications/[id].tsx)): Renders title, message, category, priority, deep-linking button, attachment links.
 - **User Profile Preferences** ([`src/app/(tabs)/profile.tsx`](file:///d:/current%20project/GRI/src/app/(tabs)/profile.tsx)): Push, Email, WhatsApp, SMS, Emergency toggles.
+- **Offline & Network Intimation System** ([`src/core/offline/OfflineNotice.tsx`](file:///d:/current%20project/GRI/src/core/offline/OfflineNotice.tsx)):
+  - Top alert banner notifying the user when offline (`📡 Offline Mode Active — Viewing cached data`).
+  - Automatic background health pinging to detect internet reconnects.
+  - Automatic queue processing ([`syncQueue.ts`](file:///d:/current%20project/GRI/src/core/offline/syncQueue.ts)) flushing pending offline requests when internet returns.
 - **Admin Mobile Management**:
   - Dashboard ([`src/app/admin/dashboard.tsx`](file:///d:/current%20project/GRI/src/app/admin/dashboard.tsx))
   - Composer ([`src/app/admin/composer.tsx`](file:///d:/current%20project/GRI/src/app/admin/composer.tsx))
