@@ -10,6 +10,9 @@ echo.
 set "ROOT_DIR=%~dp0"
 if "%ROOT_DIR:~-1%"=="\" set "ROOT_DIR=%ROOT_DIR:~0,-1%"
 
+:: Allocate increased Node.js heap memory to prevent Metro Bundler OOM crashes (exit code -1)
+set "NODE_OPTIONS=--max-old-space-size=8192"
+
 :: 1. Setup ANDROID_HOME
 if not defined ANDROID_HOME (
     if exist "%LOCALAPPDATA%\Android\Sdk" (
@@ -66,6 +69,7 @@ echo   - Root Directory : "%ROOT_DIR%"
 echo   - JAVA_HOME      : "%JAVA_HOME%"
 echo   - ANDROID_HOME   : "%ANDROID_HOME%"
 echo   - Build-Tools    : "%BUILD_TOOLS_DIR%"
+echo   - Node Memory    : 8192 MB (NODE_OPTIONS)
 echo.
 
 if not exist "%ROOT_DIR%\android\gradlew.bat" (

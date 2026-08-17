@@ -10,6 +10,9 @@ echo.
 set "ROOT_DIR=%~dp0"
 if "%ROOT_DIR:~-1%"=="\" set "ROOT_DIR=%ROOT_DIR:~0,-1%"
 
+:: Allocate increased Node.js heap memory to prevent Metro Bundler OOM crashes
+set "NODE_OPTIONS=--max-old-space-size=8192"
+
 :: 1. Setup ANDROID_HOME
 if not defined ANDROID_HOME (
     if exist "%LOCALAPPDATA%\Android\Sdk" (
