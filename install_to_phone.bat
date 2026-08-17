@@ -79,6 +79,7 @@ echo.
 echo [2/4] Checking and building Debug APK...
 if not exist "%DEBUG_APK%" (
     echo   - Debug APK not found. Compiling Debug APK with Gradle...
+    if exist "%TEMP%\metro-cache" rmdir /s /q "%TEMP%\metro-cache" > nul 2>&1
     pushd "%ROOT_DIR%\android"
     call .\gradlew.bat assembleDebug
     set "BUILD_STATUS=!ERRORLEVEL!"

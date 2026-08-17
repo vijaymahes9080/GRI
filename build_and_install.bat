@@ -74,6 +74,9 @@ if not exist "%ROOT_DIR%\android\gradlew.bat" (
     exit /b 1
 )
 
+:: Clean stale Metro cache to prevent Windows EPERM permission locks
+if exist "%TEMP%\metro-cache" rmdir /s /q "%TEMP%\metro-cache" > nul 2>&1
+
 echo [2/4] Building Standalone Release APK with Gradle...
 pushd "%ROOT_DIR%\android"
 call .\gradlew.bat assembleRelease
